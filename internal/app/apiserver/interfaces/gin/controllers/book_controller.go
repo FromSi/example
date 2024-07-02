@@ -1,10 +1,9 @@
-package main
+package controllers
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -43,22 +42,8 @@ type PostModel struct {
 	DeletedAt *gorm.DeletedAt `gorm:"index"`
 }
 
-func main() {
-	database, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
-
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	err = database.AutoMigrate(&PostModel{})
-
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	route := gin.Default()
-
-	route.POST("/books", func(context *gin.Context) {
+func InitBookController(engine *gin.Engine, database *gorm.DB) {
+	engine.POST("/books", func(context *gin.Context) {
 		var requestBody CreateBookRequestBody
 
 		if err := context.ShouldBind(&requestBody); err != nil {
@@ -93,7 +78,7 @@ func main() {
 		context.Status(http.StatusAccepted)
 	})
 
-	route.GET("/books", func(context *gin.Context) {
+	engine.GET("/books", func(context *gin.Context) {
 		var postModels []PostModel
 
 		database.Find(&postModels)
@@ -101,7 +86,7 @@ func main() {
 		context.JSON(http.StatusOK, gin.H{"data": &postModels})
 	})
 
-	route.GET("/books/:id", func(context *gin.Context) {
+	engine.GET("/books/:id", func(context *gin.Context) {
 		var request ShowBookRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
@@ -137,7 +122,7 @@ func main() {
 		context.JSON(http.StatusOK, gin.H{"data": &postModel})
 	})
 
-	route.PATCH("/books/:id", func(context *gin.Context) {
+	engine.PATCH("/books/:id", func(context *gin.Context) {
 		var request UpdateBookRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
@@ -171,13 +156,13 @@ func main() {
 		databaseResult := database.Model(&PostModel{ID: request.ID}).Updates(&postModel)
 
 		if databaseResult.Error != nil {
-			log.Println(err.Error())
+			log.Println(databaseResult.Error)
 		}
 
 		context.Status(http.StatusAccepted)
 	})
 
-	route.DELETE("/books/:id", func(context *gin.Context) {
+	engine.DELETE("/books/:id", func(context *gin.Context) {
 		var request DeleteBookRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
@@ -193,13 +178,13 @@ func main() {
 		databaseResult := database.Delete(&PostModel{ID: request.ID})
 
 		if databaseResult.Error != nil {
-			log.Println(err.Error())
+			log.Println(databaseResult.Error)
 		}
 
 		context.Status(http.StatusAccepted)
 	})
 
-	route.POST("/books/:id", func(context *gin.Context) {
+	engine.POST("/books/:id", func(context *gin.Context) {
 		var request ResetBookRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
@@ -212,7 +197,7 @@ func main() {
 			return
 		}
 
-		err = database.Unscoped().Model(&PostModel{ID: request.ID}).Update("deleted_at", nil).Error
+		err := database.Unscoped().Model(&PostModel{ID: request.ID}).Update("deleted_at", nil).Error
 
 		if err != nil {
 			log.Println(err.Error())
@@ -220,10 +205,4 @@ func main() {
 
 		context.Status(http.StatusAccepted)
 	})
-
-	err = route.Run("localhost:8080")
-
-	if err != nil {
-		log.Println(err.Error())
-	}
 }
