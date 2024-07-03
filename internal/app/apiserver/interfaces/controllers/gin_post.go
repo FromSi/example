@@ -2,49 +2,41 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
+	repositories "github.com/fromsi/example/internal/app/apiserver/domain/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
-	"time"
 )
 
-type CreateBookRequestBody struct {
+type CreatePostRequestBody struct {
 	Text string `from:"text" binding:"required"`
 }
 
-type ShowBookRequest struct {
+type ShowPostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
 
-type UpdateBookRequest struct {
+type UpdatePostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
 
-type UpdateBookRequestBody struct {
+type UpdatePostRequestBody struct {
 	Text *string `from:"text"`
 }
 
-type DeleteBookRequest struct {
+type DeletePostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
 
-type ResetBookRequest struct {
+type ResetPostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
 
-type PostModel struct {
-	ID        string `gorm:"primaryKey"`
-	Text      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *gorm.DeletedAt `gorm:"index"`
-}
-
-func InitBookController(engine *gin.Engine, database *gorm.DB) {
-	engine.POST("/books", func(context *gin.Context) {
-		var requestBody CreateBookRequestBody
+func GinPostHandler(engine *gin.Engine, repository repositories.PostRepository) {
+	engine.POST("/posts", func(context *gin.Context) {
+		var requestBody CreatePostRequestBody
 
 		if err := context.ShouldBind(&requestBody); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -68,26 +60,44 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		postModel := &PostModel{
+		post := &entities.Post{
 			ID:   id.String(),
 			Text: requestBody.Text,
 		}
 
-		database.Create(postModel)
+		err = repository.Create(post)
+
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{
+				"data": err.Error(),
+			})
+
+			log.Println(err.Error())
+
+			return
+		}
 
 		context.Status(http.StatusAccepted)
 	})
 
-	engine.GET("/books", func(context *gin.Context) {
-		var postModels []PostModel
+	engine.GET("/posts", func(context *gin.Context) {
+		posts, err := repository.GetAll()
 
-		database.Find(&postModels)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{
+				"data": err.Error(),
+			})
 
-		context.JSON(http.StatusOK, gin.H{"data": &postModels})
+			log.Println(err.Error())
+
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"data": posts})
 	})
 
-	engine.GET("/books/:id", func(context *gin.Context) {
-		var request ShowBookRequest
+	engine.GET("/posts/:id", func(context *gin.Context) {
+		var request ShowPostRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -99,11 +109,9 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		postModel := PostModel{ID: request.ID}
+		post, err := repository.FindByIdWithTrashed(request.ID)
 
-		databaseResult := database.Unscoped().First(&postModel)
-
-		if databaseResult.Error != nil {
+		if err != nil {
 			context.Status(http.StatusNotFound)
 
 			log.Println(fmt.Sprintf("%s is not found!", request.ID))
@@ -111,7 +119,7 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		if postModel.DeletedAt != nil {
+		if post.DeletedAt != nil {
 			context.Status(http.StatusGone)
 
 			log.Println(fmt.Sprintf("%s is deleted!", request.ID))
@@ -119,11 +127,11 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		context.JSON(http.StatusOK, gin.H{"data": &postModel})
+		context.JSON(http.StatusOK, gin.H{"data": post})
 	})
 
-	engine.PATCH("/books/:id", func(context *gin.Context) {
-		var request UpdateBookRequest
+	engine.PATCH("/posts/:id", func(context *gin.Context) {
+		var request UpdatePostRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -135,7 +143,7 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		var requestBody UpdateBookRequestBody
+		var requestBody UpdatePostRequestBody
 
 		if err := context.ShouldBind(&requestBody); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -147,23 +155,23 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		var postModel PostModel
+		post := entities.Post{ID: request.ID}
 
 		if requestBody.Text != nil {
-			postModel.Text = *requestBody.Text
+			post.Text = *requestBody.Text
 		}
 
-		databaseResult := database.Model(&PostModel{ID: request.ID}).Updates(&postModel)
+		err := repository.UpdateById(request.ID, &post)
 
-		if databaseResult.Error != nil {
-			log.Println(databaseResult.Error)
+		if err != nil {
+			log.Println(err)
 		}
 
 		context.Status(http.StatusAccepted)
 	})
 
-	engine.DELETE("/books/:id", func(context *gin.Context) {
-		var request DeleteBookRequest
+	engine.DELETE("/posts/:id", func(context *gin.Context) {
+		var request DeletePostRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -175,17 +183,17 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		databaseResult := database.Delete(&PostModel{ID: request.ID})
+		err := repository.DeleteById(request.ID)
 
-		if databaseResult.Error != nil {
-			log.Println(databaseResult.Error)
+		if err != nil {
+			log.Println(err)
 		}
 
 		context.Status(http.StatusAccepted)
 	})
 
-	engine.POST("/books/:id", func(context *gin.Context) {
-		var request ResetBookRequest
+	engine.POST("/posts/:id", func(context *gin.Context) {
+		var request ResetPostRequest
 
 		if err := context.ShouldBindUri(&request); err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{
@@ -197,7 +205,7 @@ func InitBookController(engine *gin.Engine, database *gorm.DB) {
 			return
 		}
 
-		err := database.Unscoped().Model(&PostModel{ID: request.ID}).Update("deleted_at", nil).Error
+		err := repository.RestoreById(request.ID)
 
 		if err != nil {
 			log.Println(err.Error())
