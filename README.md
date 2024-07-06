@@ -1,4 +1,3 @@
 Запуск сервера `make run`
 
-* `GO_EXAMPLE_HOST` - хост сервера
-* `GO_EXAMPLE_PORT` - порт сервера
+* `-config_dir_path` `GO_EXAMPLE_CONFIG_DIR_PATH` - путь к директории на файл `config.yml`

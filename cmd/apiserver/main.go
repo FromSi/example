@@ -1,8 +1,8 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	config2 "github.com/fromsi/example/configs"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
 	"github.com/fromsi/example/internal/app/apiserver/interfaces/controllers"
@@ -10,16 +10,24 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 func main() {
-	config, err := config2.NewBuilderConfig().Build()
+	configDirPath, exists := os.LookupEnv("GO_EXAMPLE_CONFIG_DIR_PATH")
+
+	if !exists {
+		flag.StringVar(&configDirPath, "config_dir_path", ".", "configuration file directory path")
+		flag.Parse()
+	}
+
+	config, err := NewConfig(configDirPath)
 
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	database, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	database, err := gorm.Open(sqlite.Open(config.Database.Connections.Sqlite.Dsn), &gorm.Config{})
 
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -54,7 +62,7 @@ func main() {
 
 	route.POST("/posts/:id", postController.Reset)
 
-	err = route.Run(fmt.Sprintf("%s:%d", config.Host, config.Port))
+	err = route.Run(fmt.Sprintf("%s:%d", config.App.Host, config.App.Port))
 
 	if err != nil {
 		log.Println(err.Error())
