@@ -11,6 +11,12 @@ type GormPostRepository struct {
 	Database *gorm.DB
 }
 
+func NewGormPostRepository(database *gorm.DB) *GormPostRepository {
+	return &GormPostRepository{
+		Database: database,
+	}
+}
+
 func (repository *GormPostRepository) Create(post *entities.Post) error {
 	return repository.Database.Create(mappers.EntityToGorm(post)).Error
 }

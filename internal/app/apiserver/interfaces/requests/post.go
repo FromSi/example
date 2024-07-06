@@ -20,6 +20,6 @@ type GinDeletePostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }
 
-type GinResetPostRequest struct {
+type GinRestorePostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }

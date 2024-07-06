@@ -1,7 +1,9 @@
 package main
 
 import (
+	"flag"
 	"github.com/spf13/viper"
+	"os"
 )
 
 type Config struct {
@@ -18,7 +20,14 @@ func (config *Config) Init() *Config {
 	return config
 }
 
-func NewConfig(dirPath string) (*Config, error) {
+func NewConfig() (*Config, error) {
+	dirPath, exists := os.LookupEnv("GO_EXAMPLE_CONFIG_DIR_PATH")
+
+	if !exists {
+		flag.StringVar(&dirPath, "config_dir_path", ".", "configuration file directory path")
+		flag.Parse()
+	}
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(dirPath)
