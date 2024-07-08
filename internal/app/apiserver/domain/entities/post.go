@@ -13,15 +13,27 @@ func init() {
 	validate = validator.New(validator.WithRequiredStructEnabled())
 }
 
-type IdValueObject struct {
+type Post struct {
+	ID        Id
+	Text      Text
+	CreatedAt *time.Time
+	UpdatedAt *time.Time
+	DeletedAt *time.Time
+}
+
+func (post Post) SetText(text string) error {
+	return post.Text.SetText(text)
+}
+
+type Id struct {
 	id string
 }
 
-func (valueObject IdValueObject) GetId() string {
+func (valueObject Id) GetId() string {
 	return valueObject.id
 }
 
-func (valueObject *IdValueObject) setId(id string) error {
+func (valueObject *Id) setId(id string) error {
 	err := validate.Var(id, "required,uuid")
 
 	if err != nil {
@@ -33,8 +45,8 @@ func (valueObject *IdValueObject) setId(id string) error {
 	return nil
 }
 
-func NewIdValueObject(id string) (*IdValueObject, error) {
-	valueObject := IdValueObject{}
+func NewId(id string) (*Id, error) {
+	valueObject := Id{}
 
 	err := valueObject.setId(id)
 
@@ -45,15 +57,15 @@ func NewIdValueObject(id string) (*IdValueObject, error) {
 	return &valueObject, nil
 }
 
-type TextValueObject struct {
+type Text struct {
 	text string
 }
 
-func (valueObject TextValueObject) GetText() string {
+func (valueObject Text) GetText() string {
 	return valueObject.text
 }
 
-func (valueObject *TextValueObject) SetText(text string) error {
+func (valueObject *Text) SetText(text string) error {
 	err := validate.Var(text, "required,gte=3,lte=255")
 
 	if err != nil {
@@ -65,8 +77,8 @@ func (valueObject *TextValueObject) SetText(text string) error {
 	return nil
 }
 
-func NewTextValueObject(text string) (*TextValueObject, error) {
-	valueObject := TextValueObject{}
+func NewText(text string) (*Text, error) {
+	valueObject := Text{}
 
 	err := valueObject.SetText(text)
 
@@ -75,16 +87,4 @@ func NewTextValueObject(text string) (*TextValueObject, error) {
 	}
 
 	return &valueObject, nil
-}
-
-type Post struct {
-	ID        IdValueObject
-	Text      TextValueObject
-	CreatedAt *time.Time
-	UpdatedAt *time.Time
-	DeletedAt *time.Time
-}
-
-func (post Post) SetText(text string) error {
-	return post.Text.SetText(text)
 }

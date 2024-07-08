@@ -6,7 +6,7 @@ import (
 	domairepository "github.com/fromsi/example/internal/app/apiserver/domain/repositories"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/app/apiserver/interfaces/controllers"
+	"github.com/fromsi/example/internal/app/apiserver/presentation/controllers"
 	pkgcqrs "github.com/fromsi/example/internal/pkg/cqrs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
@@ -45,20 +45,18 @@ func main() {
 }
 
 type Application struct {
-	Config          *Config
-	Database        *gorm.DB
-	CommandCQRS     pkgcqrs.CommandCQRS
-	QueryCQRS       pkgcqrs.QueryCQRS
-	QueryRepository *repositories.QueryRepository
+	Config      *Config
+	Database    *gorm.DB
+	CommandCQRS pkgcqrs.CommandCQRS
+	QueryCQRS   pkgcqrs.QueryCQRS
 }
 
-func NewApplication(config *Config, database *gorm.DB, commandCQRS pkgcqrs.CommandCQRS, queryCQRS pkgcqrs.QueryCQRS, queryRepository *repositories.QueryRepository) *Application {
+func NewApplication(config *Config, database *gorm.DB, commandCQRS pkgcqrs.CommandCQRS, queryCQRS pkgcqrs.QueryCQRS) *Application {
 	return &Application{
-		Config:          config,
-		Database:        database,
-		CommandCQRS:     commandCQRS,
-		QueryCQRS:       queryCQRS,
-		QueryRepository: queryRepository,
+		Config:      config,
+		Database:    database,
+		CommandCQRS: commandCQRS,
+		QueryCQRS:   queryCQRS,
 	}
 }
 
@@ -72,10 +70,9 @@ func (application Application) Run() error {
 	route := gin.Default()
 
 	postController := controllers.GinPostController{
-		Engine:          route,
-		CommandCQRS:     &application.CommandCQRS,
-		QueryCQRS:       &application.QueryCQRS,
-		QueryRepository: application.QueryRepository,
+		Engine:      route,
+		CommandCQRS: &application.CommandCQRS,
+		QueryCQRS:   &application.QueryCQRS,
 	}
 
 	route.POST("/posts", postController.Create)

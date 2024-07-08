@@ -3,9 +3,10 @@ package controllers
 import (
 	"fmt"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/commands"
-	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/app/apiserver/interfaces/mappers"
-	"github.com/fromsi/example/internal/app/apiserver/interfaces/requests"
+	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/queries"
+	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/responses"
+	"github.com/fromsi/example/internal/app/apiserver/presentation/mappers"
+	"github.com/fromsi/example/internal/app/apiserver/presentation/requests"
 	"github.com/fromsi/example/internal/pkg/cqrs"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -13,10 +14,9 @@ import (
 )
 
 type GinPostController struct {
-	Engine          *gin.Engine
-	CommandCQRS     *cqrs.CommandCQRS
-	QueryCQRS       *cqrs.QueryCQRS
-	QueryRepository *repositories.QueryRepository
+	Engine      *gin.Engine
+	CommandCQRS *cqrs.CommandCQRS
+	QueryCQRS   *cqrs.QueryCQRS
 }
 
 func (controller GinPostController) Create(context *gin.Context) {
@@ -48,7 +48,7 @@ func (controller GinPostController) Create(context *gin.Context) {
 }
 
 func (controller GinPostController) Index(context *gin.Context) {
-	posts, err := controller.QueryRepository.PostRepository.GetAll()
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{})
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -60,9 +60,17 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	response := mappers.ToGinIndexResponse(posts)
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.GetAllQueryResponse)
 
-	context.JSON(http.StatusOK, gin.H{"data": response})
+	if !exists {
+		context.Status(http.StatusNotFound)
+
+		log.Println("invalid command type")
+
+		return
+	}
+
+	context.JSON(http.StatusOK, mappers.ToGinIndexPostResponse(postQueryResponseImplementation))
 }
 
 func (controller GinPostController) Show(context *gin.Context) {
@@ -78,7 +86,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	post, err := controller.QueryRepository.PostRepository.FindByIdWithTrashed(request.ID)
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.FindByIdQuery{ID: request.ID})
 
 	if err != nil {
 		context.Status(http.StatusNotFound)
@@ -88,7 +96,17 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	if post.DeletedAt != nil {
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.FindByIdQueryResponse)
+
+	if !exists {
+		context.Status(http.StatusNotFound)
+
+		log.Println("invalid command type")
+
+		return
+	}
+
+	if postQueryResponseImplementation.IsDeleted {
 		context.Status(http.StatusGone)
 
 		log.Println(fmt.Sprintf("%s is deleted!", request.ID))
@@ -96,9 +114,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	response := mappers.ToGinShowResponse(post)
-
-	context.JSON(http.StatusOK, gin.H{"data": response})
+	context.JSON(http.StatusOK, mappers.ToGinShowPostResponse(postQueryResponseImplementation))
 }
 
 func (controller GinPostController) Update(context *gin.Context) {

@@ -29,13 +29,13 @@ func (handler CreatePostCommandHandler) Handle(command cqrs.Command) error {
 		return err
 	}
 
-	idValueObject, err := entities.NewIdValueObject(id.String())
+	idValueObject, err := entities.NewId(id.String())
 
 	if err != nil {
 		return err
 	}
 
-	textValueObject, err := entities.NewTextValueObject(commandImplementation.Text)
+	textValueObject, err := entities.NewText(commandImplementation.Text)
 
 	if err != nil {
 		return err
@@ -71,7 +71,7 @@ func (handler UpdatePostCommandHandler) Handle(command cqrs.Command) error {
 		return errors.New("invalid command type")
 	}
 
-	idValueObject, err := entities.NewIdValueObject(commandImplementation.ID)
+	idValueObject, err := entities.NewId(commandImplementation.ID)
 
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (handler UpdatePostCommandHandler) Handle(command cqrs.Command) error {
 	post := entities.Post{ID: *idValueObject}
 
 	if commandImplementation.Text != nil {
-		textValueObject, err := entities.NewTextValueObject(*commandImplementation.Text)
+		textValueObject, err := entities.NewText(*commandImplementation.Text)
 
 		if err != nil {
 			return err

@@ -41,13 +41,13 @@ func ArrayEntityToArrayGorm(entities *[]entities.Post) *[]models.GormPostModel {
 }
 
 func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
-	idValueObject, err := entities.NewIdValueObject(model.ID)
+	idValueObject, err := entities.NewId(model.ID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	textValueObject, err := entities.NewTextValueObject(model.Text)
+	textValueObject, err := entities.NewText(model.Text)
 
 	if err != nil {
 		return nil, err
