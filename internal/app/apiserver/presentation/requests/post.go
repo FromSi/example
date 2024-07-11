@@ -4,6 +4,10 @@ type GinCreatePostRequestBody struct {
 	Text string `from:"text" binding:"required"`
 }
 
+type GinIndexPostRequest struct {
+	Pageable GinPageableRequest
+}
+
 type GinShowPostRequest struct {
 	ID string `uri:"id" binding:"required,uuid"`
 }

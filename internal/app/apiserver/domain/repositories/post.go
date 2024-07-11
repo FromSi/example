@@ -1,15 +1,19 @@
 package repositories
 
-import "github.com/fromsi/example/internal/app/apiserver/domain/entities"
+import (
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
+	"github.com/fromsi/example/internal/pkg/data"
+)
 
 type MutablePostRepository interface {
-	Create(post *entities.Post) error
-	UpdateById(id string, post *entities.Post) error
-	DeleteById(id string) error
-	RestoreById(id string) error
+	Create(*entities.Post) error
+	UpdateById(string, *entities.Post) error
+	DeleteById(string) error
+	RestoreById(string) error
 }
 
 type QueryPostRepository interface {
-	FindByIdWithTrashed(id string) (*entities.Post, error)
-	GetAll() (*[]entities.Post, error)
+	FindByIdWithTrashed(string) (*entities.Post, error)
+	GetAll(data.Pageable) (*[]entities.Post, error)
+	GetTotal() (int, error)
 }

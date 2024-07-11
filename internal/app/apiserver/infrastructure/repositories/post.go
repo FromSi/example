@@ -4,6 +4,7 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
+	"github.com/fromsi/example/internal/pkg/data"
 	"gorm.io/gorm"
 )
 
@@ -45,11 +46,12 @@ func (repository *GormPostRepository) FindByIdWithTrashed(id string) (*entities.
 	return postEntity, err
 }
 
-func (repository *GormPostRepository) GetAll() (*[]entities.Post, error) {
+func (repository *GormPostRepository) GetAll(pageable data.Pageable) (*[]entities.Post, error) {
 	var postModels []models.GormPostModel
 	var postEntities *[]entities.Post
 
-	err := repository.Database.Find(&postModels).Error
+	offset := pageable.GetLimit() * (pageable.GetPage() - 1)
+	err := repository.Database.Limit(pageable.GetLimit()).Offset(offset).Find(&postModels).Error
 
 	if err != nil {
 		return nil, err
@@ -62,6 +64,19 @@ func (repository *GormPostRepository) GetAll() (*[]entities.Post, error) {
 	}
 
 	return postEntities, err
+}
+
+func (repository *GormPostRepository) GetTotal() (int, error) {
+	var postModels []models.GormPostModel
+	var total int64
+
+	err := repository.Database.Model(&postModels).Count(&total).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return int(total), err
 }
 
 func (repository *GormPostRepository) DeleteById(id string) error {

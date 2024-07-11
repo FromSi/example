@@ -3,21 +3,20 @@ package mappers
 import (
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/responses"
 	presentationresponses "github.com/fromsi/example/internal/app/apiserver/presentation/responses"
-	"github.com/gin-gonic/gin"
 )
 
-func ToGinShowPostResponse(post *responses.FindByIdQueryResponse) *presentationresponses.SuccessResponse {
+func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) *presentationresponses.SuccessResponse {
 	return &presentationresponses.SuccessResponse{
-		Data: gin.H{
-			"id":         post.Data.ID,
-			"text":       post.Data.Text,
-			"created_at": post.Data.CreatedAt,
-			"updated_at": post.Data.UpdatedAt,
+		Data: presentationresponses.PostResponse{
+			ID:        post.Data.ID,
+			Text:      post.Data.Text,
+			CreatedAt: post.Data.CreatedAt,
+			UpdatedAt: post.Data.UpdatedAt,
 		},
 	}
 }
 
-func ToGinIndexPostResponse(posts *responses.GetAllQueryResponse) *presentationresponses.SuccessArrayResponse {
+func ToGinIndexPostResponse(posts *responses.CqrsGetAllQueryResponse) *presentationresponses.SuccessArrayResponse {
 	response := []presentationresponses.PostResponse{}
 
 	for _, post := range (*posts).Data {
@@ -30,6 +29,7 @@ func ToGinIndexPostResponse(posts *responses.GetAllQueryResponse) *presentationr
 	}
 
 	return &presentationresponses.SuccessArrayResponse{
-		Data: response,
+		Data:     response,
+		Pageable: presentationresponses.NewPageableResponse(posts.Pageable),
 	}
 }

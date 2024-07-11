@@ -8,6 +8,7 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/presentation/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/requests"
 	"github.com/fromsi/example/internal/pkg/cqrs"
+	"github.com/fromsi/example/internal/pkg/data"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -48,7 +49,31 @@ func (controller GinPostController) Create(context *gin.Context) {
 }
 
 func (controller GinPostController) Index(context *gin.Context) {
-	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{})
+	var request requests.GinIndexPostRequest
+
+	if err := context.ShouldBindUri(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"data": err.Error(),
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	var pageableRequest requests.GinPageableRequest
+
+	if err := context.ShouldBindQuery(&pageableRequest); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"data": err.Error(),
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	pageable, err := data.NewEntityPageable(pageableRequest.Page, pageableRequest.Limit, data.MinTotal)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -60,7 +85,19 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	postQueryResponseImplementation, exists := postQueryResponse.(*responses.GetAllQueryResponse)
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{Pageable: pageable})
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"data": err.Error(),
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.CqrsGetAllQueryResponse)
 
 	if !exists {
 		context.Status(http.StatusNotFound)
@@ -96,7 +133,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	postQueryResponseImplementation, exists := postQueryResponse.(*responses.FindByIdQueryResponse)
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.CqrsFindByIdQueryResponse)
 
 	if !exists {
 		context.Status(http.StatusNotFound)

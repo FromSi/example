@@ -1,6 +1,9 @@
 package responses
 
-import "time"
+import (
+	"github.com/fromsi/example/internal/pkg/data"
+	"time"
+)
 
 type QueryResponse struct {
 	ID        string
@@ -9,11 +12,12 @@ type QueryResponse struct {
 	UpdatedAt *time.Time
 }
 
-type GetAllQueryResponse struct {
-	Data []QueryResponse
+type CqrsGetAllQueryResponse struct {
+	Data     []QueryResponse
+	Pageable data.Pageable
 }
 
-type FindByIdQueryResponse struct {
+type CqrsFindByIdQueryResponse struct {
 	Data      QueryResponse
 	IsDeleted bool
 }
