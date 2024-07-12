@@ -12,6 +12,13 @@ type DefaultCommandCQRS struct {
 	QueryRepository   *repositories.QueryRepository
 }
 
+func NewCommandCQRS(mutableRepository *repositories.MutableRepository, queryRepository *repositories.QueryRepository) cqrs.CommandCQRS {
+	return &DefaultCommandCQRS{
+		MutableRepository: mutableRepository,
+		QueryRepository:   queryRepository,
+	}
+}
+
 func (cqrs *DefaultCommandCQRS) Dispatch(command cqrs.Command) error {
 	commandHandler, err := getCommandHandler(command, cqrs)
 
@@ -20,13 +27,6 @@ func (cqrs *DefaultCommandCQRS) Dispatch(command cqrs.Command) error {
 	}
 
 	return commandHandler.Handle(command)
-}
-
-func NewCommandCQRS(mutableRepository *repositories.MutableRepository, queryRepository *repositories.QueryRepository) cqrs.CommandCQRS {
-	return &DefaultCommandCQRS{
-		MutableRepository: mutableRepository,
-		QueryRepository:   queryRepository,
-	}
 }
 
 func getCommandHandler(command cqrs.Command, cqrs *DefaultCommandCQRS) (cqrs.CommandHandler, error) {

@@ -10,13 +10,13 @@ const (
 )
 
 type Pageable interface {
+	SetTotal(int)
 	GetPage() int
 	GetLimit() int
 	GetNext() int
 	GetPrev() int
 	GetTotal() int
 	GetTotalPages() int
-	SetTotal(int)
 }
 
 type EntityPageable struct {
@@ -50,7 +50,7 @@ func (pageable EntityPageable) GetPage() int {
 
 func (pageable EntityPageable) GetLimit() int {
 	if pageable.Limit < MinLimitItems {
-		return MinLimitItems
+		return MaxLimitItems
 	}
 
 	if pageable.Limit > MaxLimitItems {

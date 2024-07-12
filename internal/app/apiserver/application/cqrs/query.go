@@ -11,6 +11,10 @@ type DefaultQueryCQRS struct {
 	QueryRepository *repositories.QueryRepository
 }
 
+func NewQueryCQRS(queryRepository *repositories.QueryRepository) cqrs.QueryCQRS {
+	return &DefaultQueryCQRS{QueryRepository: queryRepository}
+}
+
 func (cqrs *DefaultQueryCQRS) Ask(query cqrs.Query) (any, error) {
 	queryHandler, err := getQueryHandler(query, cqrs)
 
@@ -19,10 +23,6 @@ func (cqrs *DefaultQueryCQRS) Ask(query cqrs.Query) (any, error) {
 	}
 
 	return queryHandler.Handle(query)
-}
-
-func NewQueryCQRS(queryRepository *repositories.QueryRepository) cqrs.QueryCQRS {
-	return &DefaultQueryCQRS{QueryRepository: queryRepository}
 }
 
 func getQueryHandler(query cqrs.Query, cqrs *DefaultQueryCQRS) (cqrs.QueryHandler, error) {

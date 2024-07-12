@@ -21,9 +21,9 @@ type GinPostController struct {
 }
 
 func (controller GinPostController) Create(context *gin.Context) {
-	var requestBody requests.GinCreatePostRequestBody
+	request, err := requests.NewGinCreatePostRequest(context)
 
-	if err := context.ShouldBind(&requestBody); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -33,7 +33,7 @@ func (controller GinPostController) Create(context *gin.Context) {
 		return
 	}
 
-	err := (*controller.CommandCQRS).Dispatch(commands.CreatePostCommand{Text: requestBody.Text})
+	err = (*controller.CommandCQRS).Dispatch(commands.CreatePostCommand{Text: request.Body.Text})
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -49,9 +49,9 @@ func (controller GinPostController) Create(context *gin.Context) {
 }
 
 func (controller GinPostController) Index(context *gin.Context) {
-	var request requests.GinIndexPostRequest
+	request, err := requests.NewGinIndexPostRequest(context)
 
-	if err := context.ShouldBindUri(&request); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -61,19 +61,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	var pageableRequest requests.GinPageableRequest
-
-	if err := context.ShouldBindQuery(&pageableRequest); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
-		})
-
-		log.Println(err.Error())
-
-		return
-	}
-
-	pageable, err := data.NewEntityPageable(pageableRequest.Page, pageableRequest.Limit, data.MinTotal)
+	pageable, err := data.NewEntityPageable(request.Pageable.Page, request.Pageable.Limit, data.MinTotal)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -111,9 +99,9 @@ func (controller GinPostController) Index(context *gin.Context) {
 }
 
 func (controller GinPostController) Show(context *gin.Context) {
-	var request requests.GinShowPostRequest
+	request, err := requests.NewGinShowPostRequest(context)
 
-	if err := context.ShouldBindUri(&request); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -155,9 +143,9 @@ func (controller GinPostController) Show(context *gin.Context) {
 }
 
 func (controller GinPostController) Update(context *gin.Context) {
-	var request requests.GinUpdatePostRequest
+	request, err := requests.NewGinUpdatePostRequest(context)
 
-	if err := context.ShouldBindUri(&request); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -167,21 +155,9 @@ func (controller GinPostController) Update(context *gin.Context) {
 		return
 	}
 
-	var requestBody requests.GinUpdatePostRequestBody
-
-	if err := context.ShouldBind(&requestBody); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
-		})
-
-		log.Println(err.Error())
-
-		return
-	}
-
-	err := (*controller.CommandCQRS).Dispatch(commands.UpdateByIdPostCommand{
+	err = (*controller.CommandCQRS).Dispatch(commands.UpdateByIdPostCommand{
 		ID:   request.ID,
-		Text: requestBody.Text,
+		Text: request.Body.Text,
 	})
 
 	if err != nil {
@@ -192,9 +168,9 @@ func (controller GinPostController) Update(context *gin.Context) {
 }
 
 func (controller GinPostController) Delete(context *gin.Context) {
-	var request requests.GinDeletePostRequest
+	request, err := requests.NewGinDeletePostRequest(context)
 
-	if err := context.ShouldBindUri(&request); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -204,7 +180,7 @@ func (controller GinPostController) Delete(context *gin.Context) {
 		return
 	}
 
-	err := (*controller.CommandCQRS).Dispatch(commands.DeletePostCommand{ID: request.ID})
+	err = (*controller.CommandCQRS).Dispatch(commands.DeletePostCommand{ID: request.ID})
 
 	if err != nil {
 		log.Println(err)
@@ -214,9 +190,9 @@ func (controller GinPostController) Delete(context *gin.Context) {
 }
 
 func (controller GinPostController) Restore(context *gin.Context) {
-	var request requests.GinRestorePostRequest
+	request, err := requests.NewGinRestorePostRequest(context)
 
-	if err := context.ShouldBindUri(&request); err != nil {
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"data": err.Error(),
 		})
@@ -226,7 +202,7 @@ func (controller GinPostController) Restore(context *gin.Context) {
 		return
 	}
 
-	err := (*controller.CommandCQRS).Dispatch(commands.RestorePostCommand{ID: request.ID})
+	err = (*controller.CommandCQRS).Dispatch(commands.RestorePostCommand{ID: request.ID})
 
 	if err != nil {
 		log.Println(err.Error())
