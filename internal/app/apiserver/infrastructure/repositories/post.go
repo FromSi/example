@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
@@ -46,12 +47,20 @@ func (repository *GormPostRepository) FindByIdWithTrashed(id string) (*entities.
 	return postEntity, err
 }
 
-func (repository *GormPostRepository) GetAll(pageable data.Pageable) (*[]entities.Post, error) {
+func (repository *GormPostRepository) GetAll(pageable data.Pageable, sortable data.Sortable) (*[]entities.Post, error) {
 	var postModels []models.GormPostModel
 	var postEntities *[]entities.Post
 
 	offset := pageable.GetLimit() * (pageable.GetPage() - 1)
-	err := repository.Database.Limit(pageable.GetLimit()).Offset(offset).Find(&postModels).Error
+	query := repository.Database.Limit(pageable.GetLimit()).Offset(offset)
+
+	for iterator := sortable.GetIterator(); iterator.HasNext(); {
+		field, order := iterator.GetNext()
+
+		query.Order(fmt.Sprintf("%s %s", field, order))
+	}
+
+	err := query.Find(&postModels).Error
 
 	if err != nil {
 		return nil, err

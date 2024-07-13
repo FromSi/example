@@ -1,6 +1,9 @@
 package data
 
-import "errors"
+import (
+	"errors"
+	"github.com/fromsi/example/internal/pkg/requests"
+)
 
 const (
 	MinTotal      = 0
@@ -25,14 +28,14 @@ type EntityPageable struct {
 	Total int
 }
 
-func NewEntityPageable(page int, limit int, total int) (*EntityPageable, error) {
+func NewEntityPageable(pageable requests.PageableRequest, total int) (*EntityPageable, error) {
 	if total < MinTotal {
 		return nil, errors.New("total value is below the minimum allowed value")
 	}
 
 	return &EntityPageable{
-		Page:  page,
-		Limit: limit,
+		Page:  pageable.GetPage(),
+		Limit: pageable.GetLimit(),
 	}, nil
 }
 

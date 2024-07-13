@@ -10,6 +10,7 @@ import (
 
 type GetAllQuery struct {
 	Pageable data.Pageable
+	Sortable data.Sortable
 }
 
 type GetAllQueryHandler struct {
@@ -23,7 +24,7 @@ func (handler GetAllQueryHandler) Handle(query cqrs.Query) (any, error) {
 		return nil, errors.New("invalid command type")
 	}
 
-	posts, err := handler.QueryRepository.PostRepository.GetAll(queryImplementation.Pageable)
+	posts, err := handler.QueryRepository.PostRepository.GetAll(queryImplementation.Pageable, queryImplementation.Sortable)
 
 	if err != nil {
 		return nil, err

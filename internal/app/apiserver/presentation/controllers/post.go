@@ -61,7 +61,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	pageable, err := data.NewEntityPageable(request.Pageable.Page, request.Pageable.Limit, data.MinTotal)
+	pageable, err := data.NewEntityPageable(request.Pageable, data.MinTotal)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +73,19 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{Pageable: pageable})
+	sortable, err := data.NewEntitySortable(request.Sortable)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"data": err.Error(),
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{Pageable: pageable, Sortable: sortable})
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{

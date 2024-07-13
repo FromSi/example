@@ -4,6 +4,7 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"gorm.io/gorm"
+	"time"
 )
 
 func EntityToGorm(entity *entities.Post) *models.GormPostModel {
@@ -53,15 +54,22 @@ func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
 		return nil, err
 	}
 
+	var deletedAt *time.Time
+
+	if model.DeletedAt != nil {
+		deletedAtCopy := model.DeletedAt.Time
+		deletedAt = &deletedAtCopy
+	}
+
+	createdAt := model.CreatedAt
+	updatedAt := model.UpdatedAt
+
 	entity := entities.Post{
 		ID:        *idValueObject,
 		Text:      *textValueObject,
-		CreatedAt: &model.CreatedAt,
-		UpdatedAt: &model.UpdatedAt,
-	}
-
-	if model.DeletedAt != nil {
-		entity.DeletedAt = &model.DeletedAt.Time
+		CreatedAt: &createdAt,
+		UpdatedAt: &updatedAt,
+		DeletedAt: deletedAt,
 	}
 
 	return &entity, nil

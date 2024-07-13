@@ -16,3 +16,11 @@ func NewGinPageableRequest(context *gin.Context) (*GinPageableRequest, error) {
 
 	return &pageableRequest, nil
 }
+
+func (request GinPageableRequest) GetPage() int {
+	return request.Page
+}
+
+func (request GinPageableRequest) GetLimit() int {
+	return request.Limit
+}

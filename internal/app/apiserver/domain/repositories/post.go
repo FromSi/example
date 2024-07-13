@@ -14,6 +14,6 @@ type MutablePostRepository interface {
 
 type QueryPostRepository interface {
 	FindByIdWithTrashed(string) (*entities.Post, error)
-	GetAll(data.Pageable) (*[]entities.Post, error)
+	GetAll(data.Pageable, data.Sortable) (*[]entities.Post, error)
 	GetTotal() (int, error)
 }

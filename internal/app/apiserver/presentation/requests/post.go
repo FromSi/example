@@ -1,6 +1,7 @@
 package requests
 
 import (
+	"github.com/fromsi/example/internal/pkg/requests"
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +39,8 @@ func NewGinCreatePostRequestBody(context *gin.Context) (*GinCreatePostRequestBod
 }
 
 type GinIndexPostRequest struct {
-	Pageable GinPageableRequest
+	Pageable requests.PageableRequest
+	Sortable requests.SortableRequest
 }
 
 func NewGinIndexPostRequest(context *gin.Context) (*GinIndexPostRequest, error) {
@@ -55,6 +57,14 @@ func NewGinIndexPostRequest(context *gin.Context) (*GinIndexPostRequest, error) 
 	}
 
 	request.Pageable = *pageableRequest
+
+	sortableRequest, err := NewGinSortableRequest(context)
+
+	if err != nil {
+		return nil, err
+	}
+
+	request.Sortable = *sortableRequest
 
 	return &request, nil
 }
