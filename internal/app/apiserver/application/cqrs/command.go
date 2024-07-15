@@ -4,22 +4,25 @@ import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/commands"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/pkg/cqrs"
 )
+
+type CommandCQRS interface {
+	Dispatch(commands.Command) error
+}
 
 type DefaultCommandCQRS struct {
 	MutableRepository *repositories.MutableRepository
 	QueryRepository   *repositories.QueryRepository
 }
 
-func NewCommandCQRS(mutableRepository *repositories.MutableRepository, queryRepository *repositories.QueryRepository) cqrs.CommandCQRS {
+func NewCommandCQRS(mutableRepository *repositories.MutableRepository, queryRepository *repositories.QueryRepository) CommandCQRS {
 	return &DefaultCommandCQRS{
 		MutableRepository: mutableRepository,
 		QueryRepository:   queryRepository,
 	}
 }
 
-func (cqrs *DefaultCommandCQRS) Dispatch(command cqrs.Command) error {
+func (cqrs *DefaultCommandCQRS) Dispatch(command commands.Command) error {
 	commandHandler, err := getCommandHandler(command, cqrs)
 
 	if err != nil {
@@ -29,7 +32,7 @@ func (cqrs *DefaultCommandCQRS) Dispatch(command cqrs.Command) error {
 	return commandHandler.Handle(command)
 }
 
-func getCommandHandler(command cqrs.Command, cqrs *DefaultCommandCQRS) (cqrs.CommandHandler, error) {
+func getCommandHandler(command commands.Command, cqrs *DefaultCommandCQRS) (commands.CommandHandler, error) {
 	switch command.(type) {
 	case commands.CreatePostCommand:
 		return &commands.CreatePostCommandHandler{MutableRepository: cqrs.MutableRepository}, nil

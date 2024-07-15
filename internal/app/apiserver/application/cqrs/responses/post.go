@@ -1,7 +1,7 @@
 package responses
 
 import (
-	"github.com/fromsi/example/internal/pkg/data"
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"time"
 )
 
@@ -14,7 +14,7 @@ type QueryResponse struct {
 
 type CqrsGetAllQueryResponse struct {
 	Data     []QueryResponse
-	Pageable data.Pageable
+	Pageable entities.Pageable
 }
 
 type CqrsFindByIdQueryResponse struct {

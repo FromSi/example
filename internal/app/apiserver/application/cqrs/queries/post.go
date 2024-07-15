@@ -3,21 +3,20 @@ package queries
 import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/mappers"
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/pkg/cqrs"
-	"github.com/fromsi/example/internal/pkg/data"
 )
 
 type GetAllQuery struct {
-	Pageable data.Pageable
-	Sortable data.Sortable
+	Pageable entities.Pageable
+	Sortable entities.Sortable
 }
 
 type GetAllQueryHandler struct {
 	QueryRepository *repositories.QueryRepository
 }
 
-func (handler GetAllQueryHandler) Handle(query cqrs.Query) (any, error) {
+func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
 	queryImplementation, exists := query.(GetAllQuery)
 
 	if !exists {
@@ -49,7 +48,7 @@ type FindByIdQueryHandler struct {
 	QueryRepository *repositories.QueryRepository
 }
 
-func (handler FindByIdQueryHandler) Handle(query cqrs.Query) (any, error) {
+func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
 	queryImplementation, exists := query.(FindByIdQuery)
 
 	if !exists {

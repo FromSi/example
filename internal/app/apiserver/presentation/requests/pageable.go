@@ -2,6 +2,11 @@ package requests
 
 import "github.com/gin-gonic/gin"
 
+type PageableRequest interface {
+	GetPage() int
+	GetLimit() int
+}
+
 type GinPageableRequest struct {
 	Page  int `form:"page"`
 	Limit int `form:"limit"`

@@ -2,13 +2,13 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/fromsi/example/internal/app/apiserver/application/cqrs"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/commands"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/queries"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/responses"
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/requests"
-	"github.com/fromsi/example/internal/pkg/cqrs"
-	"github.com/fromsi/example/internal/pkg/data"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -61,7 +61,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	pageable, err := data.NewEntityPageable(request.Pageable, data.MinTotal)
+	pageable, err := entities.NewEntityPageable(request.Pageable.GetPage(), request.Pageable.GetLimit(), entities.MinTotal)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{
@@ -73,7 +73,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	sortable, err := data.NewEntitySortable(request.Sortable)
+	sortable, err := entities.NewEntitySortable(request.Sortable.GetData())
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{

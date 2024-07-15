@@ -3,10 +3,9 @@ package mappers
 import (
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/responses"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
-	"github.com/fromsi/example/internal/pkg/data"
 )
 
-func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable data.Pageable) *responses.CqrsGetAllQueryResponse {
+func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageable) *responses.CqrsGetAllQueryResponse {
 	response := responses.CqrsGetAllQueryResponse{
 		Pageable: pageable,
 	}

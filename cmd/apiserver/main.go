@@ -7,7 +7,6 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/controllers"
-	pkgcqrs "github.com/fromsi/example/internal/pkg/cqrs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 	"gorm.io/driver/sqlite"
@@ -22,8 +21,8 @@ func main() {
 			fx.Provide(NewConfig),
 			fx.Provide(repositories.NewMutableRepository),
 			fx.Provide(repositories.NewQueryRepository),
-			fx.Provide(fx.Annotate(cqrs.NewCommandCQRS, fx.As(new(pkgcqrs.CommandCQRS)))),
-			fx.Provide(fx.Annotate(cqrs.NewQueryCQRS, fx.As(new(pkgcqrs.QueryCQRS)))),
+			fx.Provide(fx.Annotate(cqrs.NewCommandCQRS, fx.As(new(cqrs.CommandCQRS)))),
+			fx.Provide(fx.Annotate(cqrs.NewQueryCQRS, fx.As(new(cqrs.QueryCQRS)))),
 			fx.Provide(func(config *Config) (*gorm.DB, error) {
 				return gorm.Open(sqlite.Open(config.Database.Connections.Sqlite.Dsn), &gorm.Config{})
 			}),
@@ -47,11 +46,11 @@ func main() {
 type Application struct {
 	Config      *Config
 	Database    *gorm.DB
-	CommandCQRS pkgcqrs.CommandCQRS
-	QueryCQRS   pkgcqrs.QueryCQRS
+	CommandCQRS cqrs.CommandCQRS
+	QueryCQRS   cqrs.QueryCQRS
 }
 
-func NewApplication(config *Config, database *gorm.DB, commandCQRS pkgcqrs.CommandCQRS, queryCQRS pkgcqrs.QueryCQRS) *Application {
+func NewApplication(config *Config, database *gorm.DB, commandCQRS cqrs.CommandCQRS, queryCQRS cqrs.QueryCQRS) *Application {
 	return &Application{
 		Config:      config,
 		Database:    database,

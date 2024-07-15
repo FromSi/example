@@ -4,18 +4,21 @@ import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/queries"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/pkg/cqrs"
 )
+
+type QueryCQRS interface {
+	Ask(queries.Query) (any, error)
+}
 
 type DefaultQueryCQRS struct {
 	QueryRepository *repositories.QueryRepository
 }
 
-func NewQueryCQRS(queryRepository *repositories.QueryRepository) cqrs.QueryCQRS {
+func NewQueryCQRS(queryRepository *repositories.QueryRepository) QueryCQRS {
 	return &DefaultQueryCQRS{QueryRepository: queryRepository}
 }
 
-func (cqrs *DefaultQueryCQRS) Ask(query cqrs.Query) (any, error) {
+func (cqrs *DefaultQueryCQRS) Ask(query queries.Query) (any, error) {
 	queryHandler, err := getQueryHandler(query, cqrs)
 
 	if err != nil {
@@ -25,7 +28,7 @@ func (cqrs *DefaultQueryCQRS) Ask(query cqrs.Query) (any, error) {
 	return queryHandler.Handle(query)
 }
 
-func getQueryHandler(query cqrs.Query, cqrs *DefaultQueryCQRS) (cqrs.QueryHandler, error) {
+func getQueryHandler(query queries.Query, cqrs *DefaultQueryCQRS) (queries.QueryHandler, error) {
 	switch query.(type) {
 	case queries.GetAllQuery:
 		return &queries.GetAllQueryHandler{QueryRepository: cqrs.QueryRepository}, nil

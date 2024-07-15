@@ -1,7 +1,7 @@
 package responses
 
 import (
-	"github.com/fromsi/example/internal/pkg/data"
+	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 )
 
 type SuccessResponse struct {
@@ -26,7 +26,7 @@ type PageableResponse struct {
 	Limit      int `json:"limit"`
 }
 
-func NewPageableResponse(pageable data.Pageable) *PageableResponse {
+func NewPageableResponse(pageable entities.Pageable) *PageableResponse {
 	if pageable == nil {
 		return nil
 	}

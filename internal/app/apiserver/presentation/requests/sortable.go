@@ -5,6 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type SortableRequest interface {
+	GetData() map[string]string
+}
+
 type GinSortableRequest struct {
 	Data map[string]string
 }

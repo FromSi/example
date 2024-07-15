@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/fromsi/example/internal/pkg/cqrs"
 	"github.com/google/uuid"
 )
 
@@ -16,7 +15,7 @@ type CreatePostCommandHandler struct {
 	MutableRepository *repositories.MutableRepository
 }
 
-func (handler CreatePostCommandHandler) Handle(command cqrs.Command) error {
+func (handler CreatePostCommandHandler) Handle(command Command) error {
 	commandImplementation, exists := command.(CreatePostCommand)
 
 	if !exists {
@@ -64,7 +63,7 @@ type UpdatePostCommandHandler struct {
 	MutableRepository *repositories.MutableRepository
 }
 
-func (handler UpdatePostCommandHandler) Handle(command cqrs.Command) error {
+func (handler UpdatePostCommandHandler) Handle(command Command) error {
 	commandImplementation, exists := command.(UpdateByIdPostCommand)
 
 	if !exists {
@@ -106,7 +105,7 @@ type DeletePostCommandHandler struct {
 	MutableRepository *repositories.MutableRepository
 }
 
-func (handler DeletePostCommandHandler) Handle(command cqrs.Command) error {
+func (handler DeletePostCommandHandler) Handle(command Command) error {
 	commandImplementation, exists := command.(DeletePostCommand)
 
 	if !exists {
@@ -130,7 +129,7 @@ type RestorePostCommandHandler struct {
 	MutableRepository *repositories.MutableRepository
 }
 
-func (handler RestorePostCommandHandler) Handle(command cqrs.Command) error {
+func (handler RestorePostCommandHandler) Handle(command Command) error {
 	commandImplementation, exists := command.(RestorePostCommand)
 
 	if !exists {

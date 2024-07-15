@@ -5,7 +5,6 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
-	"github.com/fromsi/example/internal/pkg/data"
 	"gorm.io/gorm"
 )
 
@@ -47,7 +46,7 @@ func (repository *GormPostRepository) FindByIdWithTrashed(id string) (*entities.
 	return postEntity, err
 }
 
-func (repository *GormPostRepository) GetAll(pageable data.Pageable, sortable data.Sortable) (*[]entities.Post, error) {
+func (repository *GormPostRepository) GetAll(pageable entities.Pageable, sortable entities.Sortable) (*[]entities.Post, error) {
 	var postModels []models.GormPostModel
 	var postEntities *[]entities.Post
 
