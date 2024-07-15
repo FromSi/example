@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
+	"github.com/fromsi/example/internal/app/apiserver/domain/filters"
 )
 
 type MutablePostRepository interface {
@@ -12,7 +13,7 @@ type MutablePostRepository interface {
 }
 
 type QueryPostRepository interface {
-	FindByIdWithTrashed(string) (*entities.Post, error)
+	FindByFilterWithTrashed(filters.FindPostFilter) (*entities.Post, error)
 	GetAll(entities.Pageable, entities.Sortable) (*[]entities.Post, error)
 	GetTotal() (int, error)
 }

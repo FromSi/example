@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
+	"github.com/fromsi/example/internal/app/apiserver/domain/filters"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
 )
 
@@ -55,7 +56,11 @@ func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
 		return nil, errors.New("invalid command type")
 	}
 
-	post, err := handler.QueryRepository.PostRepository.FindByIdWithTrashed(queryImplementation.ID)
+	findPostFilter := filters.FindPostFilter{
+		ID: queryImplementation.ID,
+	}
+
+	post, err := handler.QueryRepository.PostRepository.FindByFilterWithTrashed(findPostFilter)
 
 	if err != nil {
 		return nil, err

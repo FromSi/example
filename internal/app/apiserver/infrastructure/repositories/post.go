@@ -3,6 +3,7 @@ package repositories
 import (
 	"fmt"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
+	"github.com/fromsi/example/internal/app/apiserver/domain/filters"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"gorm.io/gorm"
@@ -26,10 +27,10 @@ func (repository *GormPostRepository) UpdateById(id string, post *entities.Post)
 	return repository.Database.Model(&models.GormPostModel{ID: id}).Updates(mappers.EntityToGorm(post)).Error
 }
 
-func (repository *GormPostRepository) FindByIdWithTrashed(id string) (*entities.Post, error) {
+func (repository *GormPostRepository) FindByFilterWithTrashed(filter filters.FindPostFilter) (*entities.Post, error) {
 	var postEntity *entities.Post
 
-	postModel := models.GormPostModel{ID: id}
+	postModel := models.GormPostModel{ID: filter.ID}
 
 	err := repository.Database.Unscoped().First(&postModel).Error
 
