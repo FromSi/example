@@ -9,6 +9,7 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/mappers"
 	"github.com/fromsi/example/internal/app/apiserver/presentation/requests"
+	presentationresponses "github.com/fromsi/example/internal/app/apiserver/presentation/responses"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -24,8 +25,10 @@ func (controller GinPostController) Create(context *gin.Context) {
 	request, err := requests.NewGinCreatePostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -36,8 +39,10 @@ func (controller GinPostController) Create(context *gin.Context) {
 	err = (*controller.CommandCQRS).Dispatch(commands.CreatePostCommand{Text: request.Body.Text})
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -52,8 +57,10 @@ func (controller GinPostController) Index(context *gin.Context) {
 	request, err := requests.NewGinIndexPostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -64,8 +71,10 @@ func (controller GinPostController) Index(context *gin.Context) {
 	pageable, err := entities.NewEntityPageable(request.Pageable.GetPage(), request.Pageable.GetLimit(), entities.MinTotal)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -76,8 +85,10 @@ func (controller GinPostController) Index(context *gin.Context) {
 	sortable, err := entities.NewEntitySortable(request.Sortable.GetData())
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -88,8 +99,10 @@ func (controller GinPostController) Index(context *gin.Context) {
 	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{Pageable: pageable, Sortable: sortable})
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -114,8 +127,10 @@ func (controller GinPostController) Show(context *gin.Context) {
 	request, err := requests.NewGinShowPostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -158,8 +173,10 @@ func (controller GinPostController) Update(context *gin.Context) {
 	request, err := requests.NewGinUpdatePostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -183,8 +200,10 @@ func (controller GinPostController) Delete(context *gin.Context) {
 	request, err := requests.NewGinDeletePostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())
@@ -205,8 +224,10 @@ func (controller GinPostController) Restore(context *gin.Context) {
 	request, err := requests.NewGinRestorePostRequest(context)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{
-			"data": err.Error(),
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
 		})
 
 		log.Println(err.Error())

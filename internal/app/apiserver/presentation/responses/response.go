@@ -4,17 +4,17 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 )
 
-type SuccessResponse struct {
+type Response struct {
 	Data any `json:"data"`
 }
 
-type SuccessArrayResponse struct {
+type ListResponse struct {
 	Data     any               `json:"data"`
 	Pageable *PageableResponse `json:"pageable,omitempty"`
 }
 
 type ErrorResponse struct {
-	Data any `json:"data"`
+	Message string `json:"message"`
 }
 
 type PageableResponse struct {
