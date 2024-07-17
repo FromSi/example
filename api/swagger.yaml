@@ -1,0 +1,319 @@
+openapi: 3.0.3
+info:
+  title: Example
+  version: 0.0.1
+  description: My vision of an architectural backend using pure architecture and DDD
+  contact:
+    email: fromsi665@gmail.com
+    name: FromSi
+    url: https://fromsi.net
+externalDocs:
+  description: Find out more about OpenAPI 3.0.3
+  url: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md
+servers:
+  - url: localhost:8080
+    description: make run
+tags:
+  - name: post
+    description: User Posts To Provide Information
+    externalDocs:
+      url: https://github.com/FromSi/example/blob/master/internal/app/apiserver/presentation/controllers/post.go
+      description: Go Controllers
+paths:
+  /posts:
+    post:
+      summary: Create New Post
+      tags:
+        - post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                text:
+                  type: string
+                  format: text
+                  example: Hello World!
+      responses:
+        '202':
+          description: Successful
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: Get List Post
+      tags:
+        - post
+      parameters:
+        - name: page1
+          in: query
+          description: Page of pageable
+          required: false
+          schema:
+            $ref: '#/components/schemas/PageQuery'
+        - name: limit
+          in: query
+          description: Limit of pageable
+          required: false
+          schema:
+            $ref: '#/components/schemas/LimitQuery'
+        - name: sort[id]
+          in: query
+          description: Multy-Sort by fields
+          required: false
+          schema:
+            $ref: '#/components/schemas/SortQuery'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pageable
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - text
+                        - created_at
+                        - updated_at
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+                        text:
+                          type: string
+                          format: text
+                          example: Hello World!
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: 2024-07-16T21:31:26.335809566+05:00
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: 2024-07-16T21:31:26.335809566+05:00
+                  pageable:
+                    $ref: '#/components/schemas/Pageable'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+  /posts/{id}:
+    get:
+      summary: Get One Post By ID
+      tags:
+        - post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUIDQuery'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - id
+                      - text
+                      - created_at
+                      - updated_at
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+                      text:
+                        type: string
+                        format: text
+                        example: Hello World!
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: 2024-07-16T21:31:26.335809566+05:00
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: 2024-07-16T21:31:26.335809566+05:00
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+        '410':
+          description: Deleted
+    patch:
+      summary: Update One Post By ID
+      tags:
+        - post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUIDQuery'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  format: text
+                  example: Hello World!
+      responses:
+        '202':
+          description: Successful
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete One Post By ID
+      tags:
+        - post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUIDQuery'
+      responses:
+        '202':
+          description: Successful
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Restore One Post By ID
+      tags:
+        - post
+      parameters:
+        - name: id
+          in: path
+          description: ID of post
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUIDQuery'
+      responses:
+        '202':
+          description: Successful
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              format: text
+              example: Any Message
+    Pageable:
+      type: object
+      required:
+        - pageable
+      properties:
+        pageable:
+          type: object
+          required:
+            - total
+            - total_pages
+            - next
+            - page
+            - prev
+            - limit
+          properties:
+            total:
+              type: integer
+              format: int64
+              example: 1
+            total_pages:
+              type: integer
+              format: int64
+              example: 1
+            next:
+              type: integer
+              format: int64
+              example: 1
+            page:
+              type: integer
+              format: int64
+              example: 1
+            prev:
+              type: integer
+              format: int64
+              example: 1
+            limit:
+              type: integer
+              format: int64
+              example: 25
+    UUIDQuery:
+      type: string
+      format: uuid
+      example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+    PageQuery:
+      type: integer
+      format: int64
+      example: 1
+    LimitQuery:
+      type: integer
+      format: int64
+      example: 25
+    SortQuery:
+      type: string
+      format: sort
+      example: desc
+      enum:
+        - asc
+        - desc
+    
