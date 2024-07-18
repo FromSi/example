@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/commands"
 	"github.com/fromsi/example/internal/app/apiserver/application/cqrs/queries"
@@ -143,7 +142,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 	if err != nil {
 		context.Status(http.StatusNotFound)
 
-		log.Println(fmt.Sprintf("%s is not found!", request.ID))
+		log.Printf("%s is not found!\n", request.ID)
 
 		return
 	}
@@ -161,7 +160,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 	if postQueryResponseImplementation.IsDeleted {
 		context.Status(http.StatusGone)
 
-		log.Println(fmt.Sprintf("%s is deleted!", request.ID))
+		log.Printf("%s is deleted!\n", request.ID)
 
 		return
 	}
