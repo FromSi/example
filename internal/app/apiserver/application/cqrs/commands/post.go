@@ -28,21 +28,10 @@ func (handler CreatePostCommandHandler) Handle(command Command) error {
 		return err
 	}
 
-	idValueObject, err := entities.NewId(id.String())
+	post, err := entities.NewPost(id.String(), commandImplementation.Text, nil, nil, nil)
 
 	if err != nil {
 		return err
-	}
-
-	textValueObject, err := entities.NewText(commandImplementation.Text)
-
-	if err != nil {
-		return err
-	}
-
-	post := &entities.Post{
-		ID:   *idValueObject,
-		Text: *textValueObject,
 	}
 
 	err = handler.MutableRepository.PostRepository.Create(post)

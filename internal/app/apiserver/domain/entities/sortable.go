@@ -2,7 +2,13 @@ package entities
 
 import (
 	"errors"
+	"fmt"
 	"github.com/fromsi/example/internal/pkg/tools"
+)
+
+const (
+	OrderAsc  = "asc"
+	OrderDesc = "desc"
 )
 
 type Sortable interface {
@@ -15,8 +21,8 @@ type EntitySortable struct {
 
 func NewEntitySortable(data map[string]string) (*EntitySortable, error) {
 	for _, order := range data {
-		if order != "asc" && order != "desc" {
-			return nil, errors.New("sort order must be desc or asc")
+		if order != OrderAsc && order != OrderDesc {
+			return nil, errors.New(fmt.Sprintf("sort order must be %s or %s", OrderAsc, OrderDesc))
 		}
 	}
 

@@ -42,17 +42,8 @@ func ArrayEntityToArrayGorm(entities *[]entities.Post) *[]models.GormPostModel {
 }
 
 func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
-	idValueObject, err := entities.NewId(model.ID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	textValueObject, err := entities.NewText(model.Text)
-
-	if err != nil {
-		return nil, err
-	}
+	createdAtCopy := model.CreatedAt
+	updatedAtCopy := model.UpdatedAt
 
 	var deletedAt *time.Time
 
@@ -61,18 +52,13 @@ func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
 		deletedAt = &deletedAtCopy
 	}
 
-	createdAt := model.CreatedAt
-	updatedAt := model.UpdatedAt
+	post, err := entities.NewPost(model.ID, model.Text, &createdAtCopy, &updatedAtCopy, deletedAt)
 
-	entity := entities.Post{
-		ID:        *idValueObject,
-		Text:      *textValueObject,
-		CreatedAt: &createdAt,
-		UpdatedAt: &updatedAt,
-		DeletedAt: deletedAt,
+	if err != nil {
+		return nil, err
 	}
 
-	return &entity, nil
+	return post, nil
 }
 
 func ArrayGormToArrayEntity(models *[]models.GormPostModel) (*[]entities.Post, error) {

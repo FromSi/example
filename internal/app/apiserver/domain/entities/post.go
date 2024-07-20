@@ -1,8 +1,14 @@
 package entities
 
 import (
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"time"
+)
+
+const (
+	TextMinLength = 3
+	TextMaxLength = 250
 )
 
 var (
@@ -19,6 +25,42 @@ type Post struct {
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 	DeletedAt *time.Time
+}
+
+func NewPost(id string, text string, createdAt *time.Time, updatedAt *time.Time, deletedAt *time.Time) (*Post, error) {
+	idValueObject, err := NewId(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	textValueObject, err := NewText(text)
+
+	if err != nil {
+		return nil, err
+	}
+
+	post := Post{
+		ID:   *idValueObject,
+		Text: *textValueObject,
+	}
+
+	if createdAt != nil {
+		createdAtCopy := *createdAt
+		post.CreatedAt = &createdAtCopy
+	}
+
+	if updatedAt != nil {
+		updatedAtCopy := *updatedAt
+		post.UpdatedAt = &updatedAtCopy
+	}
+
+	if deletedAt != nil {
+		deletedAtCopy := *deletedAt
+		post.DeletedAt = &deletedAtCopy
+	}
+
+	return &post, nil
 }
 
 func (post *Post) SetText(text string) error {
@@ -56,7 +98,7 @@ type Text struct {
 }
 
 func NewText(text string) (*Text, error) {
-	err := validate.Var(text, "required,gte=3,lte=255")
+	err := validate.Var(text, fmt.Sprintf("required,gte=%d,lte=%d", TextMinLength, TextMaxLength))
 
 	if err != nil {
 		return nil, err
