@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Example
   version: 0.0.1
-  description: My vision of an architectural backend using pure architecture and DDD
+  description: My vision of an architectural backend using clean architecture and DDD
   contact:
     email: fromsi665@gmail.com
     name: FromSi
