@@ -67,7 +67,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	pageable, err := entities.NewEntityPageable(request.Pageable.GetPage(), request.Pageable.GetLimit(), entities.MinTotal)
+	pageable, err := entities.NewEntityPageable(request.Pageable.GetPage(), request.Pageable.GetLimit(), entities.MinTotalItems)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, presentationresponses.Response{

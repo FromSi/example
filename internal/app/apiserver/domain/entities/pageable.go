@@ -1,18 +1,16 @@
 package entities
 
-import (
-	"errors"
-)
-
 const (
-	MinTotal      = 0
+	MinTotalItems = 0
 	MinPageOrder  = 1
 	MinLimitItems = 1
 	MaxLimitItems = 25
 )
 
 type Pageable interface {
-	SetTotal(int)
+	SetPage(int) error
+	SetLimit(int) error
+	SetTotal(int) error
 	GetPage() int
 	GetLimit() int
 	GetNext() int
@@ -28,38 +26,74 @@ type EntityPageable struct {
 }
 
 func NewEntityPageable(page int, limit int, total int) (*EntityPageable, error) {
-	if total < MinTotal {
-		return nil, errors.New("total value is below the minimum allowed value")
+	var err error
+	entityPageable := EntityPageable{}
+
+	err = entityPageable.SetPage(page)
+
+	if err != nil {
+		return nil, err
 	}
 
-	return &EntityPageable{
-		Page:  page,
-		Limit: limit,
-	}, nil
+	err = entityPageable.SetLimit(limit)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = entityPageable.SetTotal(total)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &entityPageable, nil
 }
 
-func (pageable *EntityPageable) SetTotal(total int) {
+func (pageable *EntityPageable) SetPage(page int) error {
+	pageable.Page = page
+
+	if pageable.Page < MinPageOrder {
+		pageable.Page = MinPageOrder
+	}
+
+	return nil
+}
+
+func (pageable *EntityPageable) SetLimit(limit int) error {
+	pageable.Limit = limit
+
+	if pageable.Limit < MinLimitItems {
+		pageable.Limit = MaxLimitItems
+	}
+
+	if pageable.Limit > MaxLimitItems {
+		pageable.Limit = MaxLimitItems
+	}
+
+	return nil
+}
+
+func (pageable *EntityPageable) SetTotal(total int) error {
 	pageable.Total = total
+
+	if pageable.Total < MinTotalItems {
+		pageable.Total = MinTotalItems
+	}
+
+	return nil
 }
 
 func (pageable EntityPageable) GetPage() int {
-	if pageable.Page < MinPageOrder {
-		return MinPageOrder
-	}
-
 	return pageable.Page
 }
 
 func (pageable EntityPageable) GetLimit() int {
-	if pageable.Limit < MinLimitItems {
-		return MaxLimitItems
-	}
-
-	if pageable.Limit > MaxLimitItems {
-		return MaxLimitItems
-	}
-
 	return pageable.Limit
+}
+
+func (pageable EntityPageable) GetTotal() int {
+	return pageable.Total
 }
 
 func (pageable EntityPageable) GetNext() int {
@@ -80,10 +114,6 @@ func (pageable EntityPageable) GetPrev() int {
 	}
 
 	return pageable.GetPage()
-}
-
-func (pageable EntityPageable) GetTotal() int {
-	return pageable.Total
 }
 
 func (pageable EntityPageable) GetTotalPages() int {

@@ -36,7 +36,11 @@ func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
 		return nil, err
 	}
 
-	queryImplementation.Pageable.SetTotal(total)
+	err = queryImplementation.Pageable.SetTotal(total)
+
+	if err != nil {
+		return nil, err
+	}
 
 	return mappers.ToCqrsGetAllQueryResponse(posts, queryImplementation.Pageable), nil
 }
