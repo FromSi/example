@@ -1,4 +1,4 @@
-package entities_test
+package tools_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -8,5 +8,5 @@ import (
 
 func TestEntities(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Domain Entities")
+	RunSpecs(t, "Private Package Tools")
 }

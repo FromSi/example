@@ -60,11 +60,13 @@ func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
 		return nil, errors.New("invalid command type")
 	}
 
-	findPostFilter := filters.FindPostFilter{
-		ID: queryImplementation.ID,
+	findPostFilter, err := filters.NewFindPostFilter(queryImplementation.ID)
+
+	if err != nil {
+		return nil, err
 	}
 
-	post, err := handler.QueryRepository.PostRepository.FindByFilterWithTrashed(findPostFilter)
+	post, err := handler.QueryRepository.PostRepository.FindByFilterWithTrashed(*findPostFilter)
 
 	if err != nil {
 		return nil, err

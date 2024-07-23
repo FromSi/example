@@ -1,4 +1,4 @@
-package tools_test
+package filters_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
@@ -8,5 +8,5 @@ import (
 
 func TestEntities(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Tools Suite")
+	RunSpecs(t, "Domain Filters")
 }
