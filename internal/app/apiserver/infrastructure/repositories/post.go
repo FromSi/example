@@ -20,11 +20,23 @@ func NewGormPostRepository(database *gorm.DB) *GormPostRepository {
 }
 
 func (repository *GormPostRepository) Create(post *entities.Post) error {
-	return repository.Database.Create(mappers.EntityToGorm(post)).Error
+	model, err := mappers.EntityToGorm(post)
+
+	if err != nil {
+		return err
+	}
+
+	return repository.Database.Create(model).Error
 }
 
 func (repository *GormPostRepository) UpdateById(id string, post *entities.Post) error {
-	return repository.Database.Model(&models.GormPostModel{ID: id}).Updates(mappers.EntityToGorm(post)).Error
+	model, err := mappers.EntityToGorm(post)
+
+	if err != nil {
+		return err
+	}
+
+	return repository.Database.Model(&models.GormPostModel{ID: id}).Updates(model).Error
 }
 
 func (repository *GormPostRepository) FindByFilterWithTrashed(filter filters.FindPostFilter) (*entities.Post, error) {

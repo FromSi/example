@@ -9,11 +9,23 @@ import (
 
 var _ = Describe("Post", func() {
 	It("Find Post Filter", func() {
-		id := faker.UUIDHyphenated()
-		filter, err := filters.NewFindPostFilter(id)
+		idOne := faker.UUIDHyphenated()
+		idTwo := faker.UUIDHyphenated()
+
+		filterOne, err := filters.NewFindPostFilter(idOne)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(filter).NotTo(BeNil())
-		Expect(filter.ID).To(Equal(id))
+		Expect(filterOne).NotTo(BeNil())
+
+		filterTwo, err := filters.NewFindPostFilter(idTwo)
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(filterTwo).NotTo(BeNil())
+
+		Expect(filterOne).NotTo(BeNil())
+		Expect(filterOne.ID).To(Equal(idOne))
+
+		Expect(filterTwo).NotTo(BeNil())
+		Expect(filterTwo.ID).To(Equal(idTwo))
 	})
 })

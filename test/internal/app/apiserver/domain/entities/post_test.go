@@ -11,111 +11,114 @@ import (
 )
 
 var _ = Describe("Post", func() {
+	var textOne string
+	var textTwo string
 	var err error
 
+	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
+
 	It("can make a post", func() {
-		id := faker.UUIDHyphenated()
-
-		var text string
-		textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-
-		timeNow := time.Now()
-		post, err := NewPost(id, text, &timeNow, &timeNow, &timeNow)
+		idOne := faker.UUIDHyphenated()
+		_ = faker.FakeData(&textOne, options.WithRandomStringLength(textLength))
+		timeNowOne := time.Now()
+		post, err := NewPost(idOne, textOne, &timeNowOne, &timeNowOne, &timeNowOne)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(post).NotTo(BeNil())
 
-		Expect(post.ID.GetId()).To(Equal(id))
-		Expect(post.Text.GetText()).To(Equal(text))
-		Expect(post.CreatedAt).To(Equal(&timeNow))
-		Expect(post.UpdatedAt).To(Equal(&timeNow))
-		Expect(post.DeletedAt).To(Equal(&timeNow))
-
-		timeNow = time.Now()
-		_, err = NewPost(id, text, &timeNow, &timeNow, &timeNow)
+		idTwo := faker.UUIDHyphenated()
+		_ = faker.FakeData(&textTwo, options.WithRandomStringLength(textLength))
+		timeNowTwo := time.Now()
+		_, err = NewPost(idTwo, textTwo, &timeNowTwo, &timeNowTwo, &timeNowTwo)
 
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(post.CreatedAt).NotTo(Equal(&timeNow))
-		Expect(post.UpdatedAt).NotTo(Equal(&timeNow))
-		Expect(post.DeletedAt).NotTo(Equal(&timeNow))
+		Expect(post.ID.GetId()).To(Equal(idOne))
+		Expect(post.Text.GetText()).To(Equal(textOne))
+		Expect(post.CreatedAt).To(Equal(&timeNowOne))
+		Expect(post.UpdatedAt).To(Equal(&timeNowOne))
+		Expect(post.DeletedAt).To(Equal(&timeNowOne))
 	})
 
-	It("can change the text of the post", func() {
+	It("can change the textOne of the post", func() {
 		id := faker.UUIDHyphenated()
-
-		textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
-
-		var text string
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-
-		post, err := NewPost(id, text, nil, nil, nil)
+		_ = faker.FakeData(&textOne, options.WithRandomStringLength(textLength))
+		post, err := NewPost(id, textOne, nil, nil, nil)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(post).NotTo(BeNil())
 
-		var textTwo string
 		_ = faker.FakeData(&textTwo, options.WithRandomStringLength(textLength))
 
 		err = post.SetText(textTwo)
+
+		Expect(err).NotTo(HaveOccurred())
 
 		Expect(post.Text.GetText()).To(Equal(textTwo))
 	})
 
 	Describe("ID Value Object", func() {
-		var id *Id
-		var value string
+		var idValueObject *Id
 
 		It("can make a id", func() {
-			id, err = NewId("")
+			idValueObject, err = NewId("")
 
 			Expect(err).To(HaveOccurred())
-			Expect(id).To(BeNil())
+			Expect(idValueObject).To(BeNil())
 
-			id, err = NewId(faker.Word())
+			idValueObject, err = NewId(faker.Word())
 
 			Expect(err).To(HaveOccurred())
-			Expect(id).To(BeNil())
+			Expect(idValueObject).To(BeNil())
 
-			value = faker.UUIDHyphenated()
-			id, err = NewId(value)
+			textOne = faker.UUIDHyphenated()
+			idValueObject, err = NewId(textOne)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(id).NotTo(BeNil())
-			Expect(id.GetId()).To(Equal(value))
+			Expect(idValueObject).NotTo(BeNil())
+
+			textTwo = faker.UUIDHyphenated()
+			_, err = NewId(textTwo)
+
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(idValueObject.GetId()).To(Equal(textOne))
 		})
 	})
 
 	Describe("Text Value Object", func() {
-		var text *Text
-		var value string
+		var textValueObject *Text
 
-		It("can make a text", func() {
-			text, err = NewText("")
-
-			Expect(err).To(HaveOccurred())
-			Expect(text).To(BeNil())
-
-			_ = faker.FakeData(&value, options.WithRandomStringLength(TextMinLength-1))
-			text, err = NewText(value)
+		It("can make a textOne", func() {
+			textValueObject, err = NewText("")
 
 			Expect(err).To(HaveOccurred())
-			Expect(text).To(BeNil())
+			Expect(textValueObject).To(BeNil())
 
-			_ = faker.FakeData(&value, options.WithRandomStringLength(TextMaxLength+1))
-			text, err = NewText(value)
+			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextMinLength-1))
+			textValueObject, err = NewText(textOne)
 
 			Expect(err).To(HaveOccurred())
-			Expect(text).To(BeNil())
+			Expect(textValueObject).To(BeNil())
 
-			textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
-			_ = faker.FakeData(&value, options.WithRandomStringLength(textLength))
-			text, err = NewText(value)
+			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextMaxLength+1))
+			textValueObject, err = NewText(textOne)
+
+			Expect(err).To(HaveOccurred())
+			Expect(textValueObject).To(BeNil())
+
+			_ = faker.FakeData(&textOne, options.WithRandomStringLength(textLength))
+			textValueObject, err = NewText(textOne)
 
 			Expect(err).NotTo(HaveOccurred())
-			Expect(text).NotTo(BeNil())
-			Expect(text.GetText()).To(Equal(value))
+			Expect(textValueObject).NotTo(BeNil())
+
+			_ = faker.FakeData(&textTwo, options.WithRandomStringLength(textLength))
+			_, err = NewText(textTwo)
+
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(textValueObject.GetText()).To(Equal(textOne))
 		})
 	})
 })

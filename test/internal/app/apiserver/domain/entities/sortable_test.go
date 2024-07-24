@@ -11,13 +11,7 @@ import (
 )
 
 var _ = Describe("Sortable", func() {
-	var err error
-
 	Describe("Entity Sortable", func() {
-		var entitySortable *EntitySortable
-		var valueString string
-		var value map[string]string
-
 		It("must support the sortable interface", func() {
 			instance := EntitySortable{}
 
@@ -32,43 +26,60 @@ var _ = Describe("Sortable", func() {
 		})
 
 		It("cannot take a value different from desc or asc", func() {
+			var valueString string
+
 			_ = faker.FakeData(&valueString, options.WithRandomStringLength(4))
 
 			if valueString == OrderAsc || valueString == OrderDesc {
 				valueString = "order"
 			}
 
-			value = map[string]string{"field": valueString}
-			entitySortable, err = NewEntitySortable(value)
+			value := map[string]string{"field": valueString}
+			entitySortable, err := NewEntitySortable(value)
 
 			Expect(err).To(HaveOccurred())
 			Expect(entitySortable).To(BeNil())
 		})
 
 		It("can take the value asc", func() {
-			value = map[string]string{"field": OrderAsc}
-			entitySortable, err = NewEntitySortable(value)
+			value := map[string]string{"field": OrderAsc}
+			entitySortable, err := NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entitySortable).NotTo(BeNil())
+
+			_, err = NewEntitySortable(map[string]string{})
+
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(entitySortable.Data).To(Equal(value))
 		})
 
 		It("can take the value desc", func() {
-			value = map[string]string{"field": OrderDesc}
-			entitySortable, err = NewEntitySortable(value)
+			value := map[string]string{"field": OrderDesc}
+			entitySortable, err := NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entitySortable).NotTo(BeNil())
+
+			_, err = NewEntitySortable(map[string]string{})
+
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(entitySortable.Data).To(Equal(value))
 		})
 
 		It("can extract the iterator", func() {
-			value = map[string]string{"field": OrderDesc}
-			entitySortable, err = NewEntitySortable(value)
+			value := map[string]string{"field": OrderDesc}
+			entitySortable, err := NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entitySortable).NotTo(BeNil())
+
+			_, err = NewEntitySortable(map[string]string{})
+
+			Expect(err).NotTo(HaveOccurred())
+
 			Expect(entitySortable.GetIterator()).To(Equal(tools.NewMapStringIterator(value)))
 		})
 	})

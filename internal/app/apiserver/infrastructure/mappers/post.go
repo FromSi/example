@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-func EntityToGorm(entity *entities.Post) *models.GormPostModel {
+func EntityToGorm(entity *entities.Post) (*models.GormPostModel, error) {
 	if entity == nil {
-		return nil
+		return nil, nil
 	}
 
 	model := models.GormPostModel{
@@ -34,21 +34,27 @@ func EntityToGorm(entity *entities.Post) *models.GormPostModel {
 		}
 	}
 
-	return &model
+	return &model, nil
 }
 
-func ArrayEntityToArrayGorm(entitySlice *[]entities.Post) *[]models.GormPostModel {
+func ArrayEntityToArrayGorm(entitySlice *[]entities.Post) (*[]models.GormPostModel, error) {
 	if entitySlice == nil {
-		return nil
+		return nil, nil
 	}
 
 	modelSlice := []models.GormPostModel{}
 
 	for _, item := range *entitySlice {
-		modelSlice = append(modelSlice, *EntityToGorm(&item))
+		model, err := EntityToGorm(&item)
+
+		if err != nil {
+			return nil, err
+		}
+
+		modelSlice = append(modelSlice, *model)
 	}
 
-	return &modelSlice
+	return &modelSlice, nil
 }
 
 func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {

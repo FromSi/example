@@ -4,6 +4,7 @@ import (
 	. "github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"math/rand"
 	"reflect"
 )
 
@@ -22,6 +23,10 @@ var _ = Describe("Pageable", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entityPageable).NotTo(BeNil())
+
+			_, err = NewEntityPageable(rand.Intn(100)+MinPageOrder, MinLimitItems, MinTotalItems)
+
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("must support the pageable interface", func() {

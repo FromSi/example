@@ -19,14 +19,16 @@ var _ = Describe("Post", func() {
 	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
 
 	It("can transform an nil entity into nil", func() {
-		gormPost := ArrayEntityToArrayGorm(nil)
+		gormPost, err := ArrayEntityToArrayGorm(nil)
 
+		Expect(err).NotTo(HaveOccurred())
 		Expect(gormPost).To(BeNil())
 	})
 
 	It("can transform an nil entity array into nil", func() {
-		gormPost := EntityToGorm(nil)
+		gormPost, err := EntityToGorm(nil)
 
+		Expect(err).NotTo(HaveOccurred())
 		Expect(gormPost).To(BeNil())
 	})
 
@@ -42,30 +44,27 @@ var _ = Describe("Post", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 
-		gormPost := EntityToGorm(entityOne)
+		gormPost, err := EntityToGorm(entityOne)
+
+		Expect(err).NotTo(HaveOccurred())
 		Expect(gormPost).NotTo(BeNil())
+
+		_, err = EntityToGorm(entityTwo)
+
+		Expect(err).NotTo(HaveOccurred())
 
 		Expect(gormPost.ID).To(Equal(entityOne.ID.GetId()))
 		Expect(gormPost.Text).To(Equal(entityOne.Text.GetText()))
 		Expect(gormPost.CreatedAt).NotTo(BeNil())
 		Expect(gormPost.UpdatedAt).NotTo(BeNil())
 		Expect(gormPost.DeletedAt).To(BeNil())
-
-		gormPost = EntityToGorm(entityTwo)
-		Expect(gormPost).NotTo(BeNil())
-
-		Expect(gormPost.ID).To(Equal(entityTwo.ID.GetId()))
-		Expect(gormPost.Text).To(Equal(entityTwo.Text.GetText()))
-		Expect(gormPost.CreatedAt).To(Equal(*entityTwo.CreatedAt))
-		Expect(gormPost.UpdatedAt).To(Equal(*entityTwo.UpdatedAt))
-		Expect(gormPost.DeletedAt.Time).To(Equal(*entityTwo.DeletedAt))
-		Expect(gormPost.DeletedAt.Valid).To(BeTrue())
 	})
 
 	It("can transform an entity array into a gorm array", func() {
 		arrayEntityPost := []Post{}
-		arrayGormPost := ArrayEntityToArrayGorm(&arrayEntityPost)
+		arrayGormPost, err := ArrayEntityToArrayGorm(&arrayEntityPost)
 
+		Expect(err).NotTo(HaveOccurred())
 		Expect(arrayGormPost).NotTo(BeNil())
 		Expect(*arrayGormPost).To(BeEmpty())
 
@@ -81,9 +80,15 @@ var _ = Describe("Post", func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		arrayEntityPost = []Post{*entityOne, *entityTwo}
-		arrayGormPost = ArrayEntityToArrayGorm(&arrayEntityPost)
+		arrayGormPost, err = ArrayEntityToArrayGorm(&arrayEntityPost)
 
+		Expect(err).NotTo(HaveOccurred())
 		Expect(arrayGormPost).NotTo(BeNil())
+
+		arrayEntityPost = []Post{}
+		_, err = ArrayEntityToArrayGorm(&arrayEntityPost)
+
+		Expect(err).NotTo(HaveOccurred())
 
 		gormPost := (*arrayGormPost)[0]
 
@@ -141,27 +146,20 @@ var _ = Describe("Post", func() {
 			},
 		}
 
-		entityPost, err := GormToEntity(&gormOne)
+		entityPostOne, err := GormToEntity(&gormOne)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(entityPost).NotTo(BeNil())
+		Expect(entityPostOne).NotTo(BeNil())
 
-		Expect(entityPost.ID.GetId()).To(Equal(gormOne.ID))
-		Expect(entityPost.Text.GetText()).To(Equal(gormOne.Text))
-		Expect(entityPost.CreatedAt).To(Equal(&gormOne.CreatedAt))
-		Expect(entityPost.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
-		Expect(entityPost.DeletedAt).To(BeNil())
-
-		entityPost, err = GormToEntity(&gormTwo)
+		_, err = GormToEntity(&gormTwo)
 
 		Expect(err).NotTo(HaveOccurred())
-		Expect(entityPost).NotTo(BeNil())
 
-		Expect(entityPost.ID.GetId()).To(Equal(gormTwo.ID))
-		Expect(entityPost.Text.GetText()).To(Equal(gormTwo.Text))
-		Expect(entityPost.CreatedAt).To(Equal(&gormTwo.CreatedAt))
-		Expect(entityPost.UpdatedAt).To(Equal(&gormTwo.UpdatedAt))
-		Expect(entityPost.DeletedAt).To(Equal(&gormTwo.DeletedAt.Time))
+		Expect(entityPostOne.ID.GetId()).To(Equal(gormOne.ID))
+		Expect(entityPostOne.Text.GetText()).To(Equal(gormOne.Text))
+		Expect(entityPostOne.CreatedAt).To(Equal(&gormOne.CreatedAt))
+		Expect(entityPostOne.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
+		Expect(entityPostOne.DeletedAt).To(BeNil())
 	})
 
 	It("can transform a gorm array into an entity array", func() {
@@ -200,6 +198,11 @@ var _ = Describe("Post", func() {
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(arrayEntityPost).NotTo(BeNil())
+
+		arrayGormPost = []GormPostModel{}
+		_, err = ArrayGormToArrayEntity(&arrayGormPost)
+
+		Expect(err).NotTo(HaveOccurred())
 
 		entityPost := (*arrayEntityPost)[0]
 

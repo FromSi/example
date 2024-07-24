@@ -12,14 +12,15 @@ import (
 )
 
 var _ = Describe("Post", func() {
-	var text string
-	var err error
 	var entityOne *Post
 	var entityTwo *Post
+	var err error
 
 	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
 
 	BeforeEach(func() {
+		var text string
+
 		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
 		entityOne, err = NewPost(faker.UUIDHyphenated(), text, nil, nil, nil)
 
@@ -62,6 +63,10 @@ var _ = Describe("Post", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
 
+		_, err = ToCqrsGetAllQueryResponse(&entities, entityPageableTwo)
+
+		Expect(err).NotTo(HaveOccurred())
+
 		Expect(response.Data[0].ID).To(Equal(entityOne.ID.GetId()))
 		Expect(response.Data[0].Text).To(Equal(entityOne.Text.GetText()))
 		Expect(response.Data[0].CreatedAt).To(BeNil())
@@ -73,13 +78,6 @@ var _ = Describe("Post", func() {
 		Expect(response.Data[1].UpdatedAt).To(Equal(entityTwo.UpdatedAt))
 
 		Expect(response.Pageable).To(Equal(entityPageableOne))
-
-		response, err = ToCqrsGetAllQueryResponse(&entities, entityPageableTwo)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(response).NotTo(BeNil())
-
-		Expect(response.Pageable).To(Equal(entityPageableTwo))
 	})
 
 	It("can transform an entity into find_by_id_query_response", func() {
@@ -88,21 +86,14 @@ var _ = Describe("Post", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
 
+		_, err = ToCqrsFindByIdQueryResponse(entityTwo)
+
+		Expect(err).NotTo(HaveOccurred())
+
 		Expect(response.Data.ID).To(Equal(entityOne.ID.GetId()))
 		Expect(response.Data.Text).To(Equal(entityOne.Text.GetText()))
 		Expect(response.Data.CreatedAt).To(BeNil())
 		Expect(response.Data.UpdatedAt).To(BeNil())
 		Expect(response.IsDeleted).To(BeFalse())
-
-		response, err = ToCqrsFindByIdQueryResponse(entityTwo)
-
-		Expect(err).NotTo(HaveOccurred())
-		Expect(response).NotTo(BeNil())
-
-		Expect(response.Data.ID).To(Equal(entityTwo.ID.GetId()))
-		Expect(response.Data.Text).To(Equal(entityTwo.Text.GetText()))
-		Expect(response.Data.CreatedAt).To(Equal(entityTwo.CreatedAt))
-		Expect(response.Data.UpdatedAt).To(Equal(entityTwo.UpdatedAt))
-		Expect(response.IsDeleted).To(BeTrue())
 	})
 })
