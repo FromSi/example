@@ -8,9 +8,15 @@ import (
 )
 
 func EntityToGorm(entity *entities.Post) *models.GormPostModel {
+	if entity == nil {
+		return nil
+	}
+
 	model := models.GormPostModel{
-		ID:   entity.ID.GetId(),
-		Text: entity.Text.GetText(),
+		ID:        entity.ID.GetId(),
+		Text:      entity.Text.GetText(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	if entity.CreatedAt != nil {
@@ -31,17 +37,25 @@ func EntityToGorm(entity *entities.Post) *models.GormPostModel {
 	return &model
 }
 
-func ArrayEntityToArrayGorm(entities *[]entities.Post) *[]models.GormPostModel {
-	posts := []models.GormPostModel{}
-
-	for _, item := range *entities {
-		posts = append(posts, *EntityToGorm(&item))
+func ArrayEntityToArrayGorm(entitySlice *[]entities.Post) *[]models.GormPostModel {
+	if entitySlice == nil {
+		return nil
 	}
 
-	return &posts
+	modelSlice := []models.GormPostModel{}
+
+	for _, item := range *entitySlice {
+		modelSlice = append(modelSlice, *EntityToGorm(&item))
+	}
+
+	return &modelSlice
 }
 
 func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
+	if model == nil {
+		return nil, nil
+	}
+
 	createdAtCopy := model.CreatedAt
 	updatedAtCopy := model.UpdatedAt
 
@@ -52,27 +66,31 @@ func GormToEntity(model *models.GormPostModel) (*entities.Post, error) {
 		deletedAt = &deletedAtCopy
 	}
 
-	post, err := entities.NewPost(model.ID, model.Text, &createdAtCopy, &updatedAtCopy, deletedAt)
+	entity, err := entities.NewPost(model.ID, model.Text, &createdAtCopy, &updatedAtCopy, deletedAt)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return post, nil
+	return entity, nil
 }
 
-func ArrayGormToArrayEntity(models *[]models.GormPostModel) (*[]entities.Post, error) {
-	posts := []entities.Post{}
+func ArrayGormToArrayEntity(modelSlice *[]models.GormPostModel) (*[]entities.Post, error) {
+	if modelSlice == nil {
+		return nil, nil
+	}
 
-	for _, item := range *models {
-		post, err := GormToEntity(&item)
+	entitySlice := []entities.Post{}
+
+	for _, item := range *modelSlice {
+		entity, err := GormToEntity(&item)
 
 		if err != nil {
 			return nil, err
 		}
 
-		posts = append(posts, *post)
+		entitySlice = append(entitySlice, *entity)
 	}
 
-	return &posts, nil
+	return &entitySlice, nil
 }

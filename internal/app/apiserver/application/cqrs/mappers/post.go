@@ -5,9 +5,27 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 )
 
-func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageable) *responses.CqrsGetAllQueryResponse {
+func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageable) (*responses.CqrsGetAllQueryResponse, error) {
+	if pageable == nil {
+		entityPageable, err := entities.NewEntityPageable(
+			entities.MinPageOrder,
+			entities.MaxLimitItems,
+			entities.MinTotalItems,
+		)
+
+		if err == nil {
+			return nil, err
+		}
+
+		pageable = entityPageable
+	}
+
 	response := responses.CqrsGetAllQueryResponse{
 		Pageable: pageable,
+	}
+
+	if posts == nil {
+		return &response, nil
 	}
 
 	for _, post := range *posts {
@@ -19,10 +37,14 @@ func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageabl
 		})
 	}
 
-	return &response
+	return &response, nil
 }
 
-func ToCqrsFindByIdQueryResponse(post *entities.Post) *responses.CqrsFindByIdQueryResponse {
+func ToCqrsFindByIdQueryResponse(post *entities.Post) (*responses.CqrsFindByIdQueryResponse, error) {
+	if post == nil {
+		return nil, nil
+	}
+
 	response := responses.CqrsFindByIdQueryResponse{
 		Data: responses.QueryResponse{
 			ID:        post.ID.GetId(),
@@ -36,5 +58,5 @@ func ToCqrsFindByIdQueryResponse(post *entities.Post) *responses.CqrsFindByIdQue
 		response.IsDeleted = true
 	}
 
-	return &response
+	return &response, nil
 }

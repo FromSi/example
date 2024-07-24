@@ -13,6 +13,7 @@ var _ = Describe("Post", func() {
 		filter, err := filters.NewFindPostFilter(id)
 
 		Expect(err).NotTo(HaveOccurred())
+		Expect(filter).NotTo(BeNil())
 		Expect(filter.ID).To(Equal(id))
 	})
 })

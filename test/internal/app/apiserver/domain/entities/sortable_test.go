@@ -42,6 +42,7 @@ var _ = Describe("Sortable", func() {
 			entitySortable, err = NewEntitySortable(value)
 
 			Expect(err).To(HaveOccurred())
+			Expect(entitySortable).To(BeNil())
 		})
 
 		It("can take the value asc", func() {
@@ -49,6 +50,7 @@ var _ = Describe("Sortable", func() {
 			entitySortable, err = NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
+			Expect(entitySortable).NotTo(BeNil())
 			Expect(entitySortable.Data).To(Equal(value))
 		})
 
@@ -57,6 +59,7 @@ var _ = Describe("Sortable", func() {
 			entitySortable, err = NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
+			Expect(entitySortable).NotTo(BeNil())
 			Expect(entitySortable.Data).To(Equal(value))
 		})
 
@@ -65,6 +68,7 @@ var _ = Describe("Sortable", func() {
 			entitySortable, err = NewEntitySortable(value)
 
 			Expect(err).NotTo(HaveOccurred())
+			Expect(entitySortable).NotTo(BeNil())
 			Expect(entitySortable.GetIterator()).To(Equal(tools.NewMapStringIterator(value)))
 		})
 	})

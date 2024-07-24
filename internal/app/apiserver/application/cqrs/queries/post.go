@@ -42,7 +42,13 @@ func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
 		return nil, err
 	}
 
-	return mappers.ToCqrsGetAllQueryResponse(posts, queryImplementation.Pageable), nil
+	response, err := mappers.ToCqrsGetAllQueryResponse(posts, queryImplementation.Pageable)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }
 
 type FindByIdQuery struct {
@@ -72,5 +78,11 @@ func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
 		return nil, err
 	}
 
-	return mappers.ToCqrsFindByIdQueryResponse(post), nil
+	response, err := mappers.ToCqrsFindByIdQueryResponse(post)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
 }

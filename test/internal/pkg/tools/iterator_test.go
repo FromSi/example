@@ -17,6 +17,7 @@ var _ = Describe("Iterator", func() {
 		It("can correctly ignore if empty", func() {
 			iterator = NewMapStringIterator(data)
 
+			Expect(iterator).NotTo(BeNil())
 			Expect(iterator.HasNext()).To(BeFalse())
 
 			key, value = iterator.GetNext()
@@ -32,6 +33,7 @@ var _ = Describe("Iterator", func() {
 
 			iterator = NewMapStringIterator(data)
 
+			Expect(iterator).NotTo(BeNil())
 			Expect(iterator.HasNext()).To(BeTrue())
 
 			key, value = iterator.GetNext()
@@ -55,6 +57,8 @@ var _ = Describe("Iterator", func() {
 			}
 
 			iterator = NewMapStringIterator(data)
+
+			Expect(iterator).NotTo(BeNil())
 
 			for i := 0; i < 3; i++ {
 				Expect(iterator.HasNext()).To(BeTrue())
