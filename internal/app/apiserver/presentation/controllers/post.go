@@ -119,7 +119,21 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, mappers.ToGinIndexPostResponse(postQueryResponseImplementation))
+	response, err := mappers.ToGinIndexPostResponse(postQueryResponseImplementation)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	context.JSON(http.StatusOK, response)
 }
 
 func (controller GinPostController) Show(context *gin.Context) {
@@ -165,7 +179,21 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, mappers.ToGinShowPostResponse(postQueryResponseImplementation))
+	response, err := mappers.ToGinShowPostResponse(postQueryResponseImplementation)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, presentationresponses.Response{
+			Data: presentationresponses.ErrorResponse{
+				Message: err.Error(),
+			},
+		})
+
+		log.Println(err.Error())
+
+		return
+	}
+
+	context.JSON(http.StatusOK, response)
 }
 
 func (controller GinPostController) Update(context *gin.Context) {

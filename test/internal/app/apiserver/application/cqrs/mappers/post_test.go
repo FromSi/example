@@ -33,7 +33,7 @@ var _ = Describe("Post", func() {
 		Expect(err).NotTo(HaveOccurred())
 	})
 
-	It("can transform an nil entity into nil", func() {
+	It("can transform an nil into nil", func() {
 		findByIdQueryResponse, err := ToCqrsFindByIdQueryResponse(nil)
 
 		Expect(err).NotTo(HaveOccurred())

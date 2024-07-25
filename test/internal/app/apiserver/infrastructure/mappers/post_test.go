@@ -18,206 +18,203 @@ var _ = Describe("Post", func() {
 
 	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
 
-	It("can transform an nil entity into nil", func() {
-		gormPost, err := ArrayEntityToArrayGorm(nil)
+	Describe("Gorm", func() {
+		It("can transform an nil into nil", func() {
+			gormPostOne, err := ArrayEntityToArrayGorm(nil)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(gormPost).To(BeNil())
-	})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(gormPostOne).To(BeNil())
 
-	It("can transform an nil entity array into nil", func() {
-		gormPost, err := EntityToGorm(nil)
+			gormPostTwo, err := EntityToGorm(nil)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(gormPost).To(BeNil())
-	})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(gormPostTwo).To(BeNil())
 
-	It("can transform an entity into a gorm", func() {
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		entityOne, err := NewPost(faker.UUIDHyphenated(), text, nil, nil, nil)
+			entityPostOne, err := GormToEntity(nil)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(entityPostOne).To(BeNil())
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow := time.Now()
-		entityTwo, err := NewPost(faker.UUIDHyphenated(), text, &timeNow, &timeNow, &timeNow)
+			entityPostTwo, err := ArrayGormToArrayEntity(nil)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(entityPostTwo).To(BeNil())
+		})
 
-		gormPost, err := EntityToGorm(entityOne)
+		It("can transform an entity into a model", func() {
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow := time.Now()
+			entityOne, err := NewPost(faker.UUIDHyphenated(), text, &timeNow, &timeNow, &timeNow)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(gormPost).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
-		_, err = EntityToGorm(entityTwo)
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			entityTwo, err := NewPost(faker.UUIDHyphenated(), text, nil, nil, nil)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(gormPost.ID).To(Equal(entityOne.ID.GetId()))
-		Expect(gormPost.Text).To(Equal(entityOne.Text.GetText()))
-		Expect(gormPost.CreatedAt).NotTo(BeNil())
-		Expect(gormPost.UpdatedAt).NotTo(BeNil())
-		Expect(gormPost.DeletedAt).To(BeNil())
-	})
+			gormPost, err := EntityToGorm(entityOne)
 
-	It("can transform an entity array into a gorm array", func() {
-		arrayEntityPost := []Post{}
-		arrayGormPost, err := ArrayEntityToArrayGorm(&arrayEntityPost)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(gormPost).NotTo(BeNil())
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(arrayGormPost).NotTo(BeNil())
-		Expect(*arrayGormPost).To(BeEmpty())
+			_, err = EntityToGorm(entityTwo)
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		entityOne, err := NewPost(faker.UUIDHyphenated(), text, nil, nil, nil)
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(gormPost.ID).To(Equal(entityOne.ID.GetId()))
+			Expect(gormPost.Text).To(Equal(entityOne.Text.GetText()))
+			Expect(gormPost.CreatedAt).To(Equal(*entityOne.CreatedAt))
+			Expect(gormPost.UpdatedAt).To(Equal(*entityOne.UpdatedAt))
+			Expect(gormPost.DeletedAt.Time).To(Equal(*entityOne.DeletedAt))
+			Expect(gormPost.DeletedAt.Valid).To(BeTrue())
+		})
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow := time.Now()
-		entityTwo, err := NewPost(faker.UUIDHyphenated(), text, &timeNow, &timeNow, &timeNow)
+		It("can transform an entity array into a model array", func() {
+			arrayEntityPost := []Post{}
+			arrayGormPost, err := ArrayEntityToArrayGorm(&arrayEntityPost)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(arrayGormPost).NotTo(BeNil())
+			Expect(*arrayGormPost).To(BeEmpty())
 
-		arrayEntityPost = []Post{*entityOne, *entityTwo}
-		arrayGormPost, err = ArrayEntityToArrayGorm(&arrayEntityPost)
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			entityOne, err := NewPost(faker.UUIDHyphenated(), text, nil, nil, nil)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(arrayGormPost).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
-		arrayEntityPost = []Post{}
-		_, err = ArrayEntityToArrayGorm(&arrayEntityPost)
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow := time.Now()
+			entityTwo, err := NewPost(faker.UUIDHyphenated(), text, &timeNow, &timeNow, &timeNow)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		gormPost := (*arrayGormPost)[0]
+			arrayEntityPost = []Post{*entityOne, *entityTwo}
+			arrayGormPost, err = ArrayEntityToArrayGorm(&arrayEntityPost)
 
-		Expect(gormPost.ID).To(Equal(entityOne.ID.GetId()))
-		Expect(gormPost.Text).To(Equal(entityOne.Text.GetText()))
-		Expect(gormPost.CreatedAt).NotTo(BeNil())
-		Expect(gormPost.UpdatedAt).NotTo(BeNil())
-		Expect(gormPost.DeletedAt).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(arrayGormPost).NotTo(BeNil())
 
-		gormPost = (*arrayGormPost)[1]
+			arrayEntityPost = []Post{}
+			_, err = ArrayEntityToArrayGorm(&arrayEntityPost)
 
-		Expect(gormPost.ID).To(Equal(entityTwo.ID.GetId()))
-		Expect(gormPost.Text).To(Equal(entityTwo.Text.GetText()))
-		Expect(gormPost.CreatedAt).To(Equal(*entityTwo.CreatedAt))
-		Expect(gormPost.UpdatedAt).To(Equal(*entityTwo.UpdatedAt))
-		Expect(gormPost.DeletedAt.Time).To(Equal(*entityTwo.DeletedAt))
-		Expect(gormPost.DeletedAt.Valid).To(BeTrue())
-	})
+			Expect(err).NotTo(HaveOccurred())
 
-	It("can transform a nil gorm into nil", func() {
-		entityPost, err := GormToEntity(nil)
+			gormPost := (*arrayGormPost)[0]
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(entityPost).To(BeNil())
-	})
+			Expect(gormPost.ID).To(Equal(entityOne.ID.GetId()))
+			Expect(gormPost.Text).To(Equal(entityOne.Text.GetText()))
+			Expect(gormPost.CreatedAt).NotTo(BeNil())
+			Expect(gormPost.UpdatedAt).NotTo(BeNil())
+			Expect(gormPost.DeletedAt).To(BeNil())
 
-	It("can transform a nil gorm array into nil", func() {
-		entityPost, err := ArrayGormToArrayEntity(nil)
+			gormPost = (*arrayGormPost)[1]
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(entityPost).To(BeNil())
-	})
+			Expect(gormPost.ID).To(Equal(entityTwo.ID.GetId()))
+			Expect(gormPost.Text).To(Equal(entityTwo.Text.GetText()))
+			Expect(gormPost.CreatedAt).To(Equal(*entityTwo.CreatedAt))
+			Expect(gormPost.UpdatedAt).To(Equal(*entityTwo.UpdatedAt))
+			Expect(gormPost.DeletedAt.Time).To(Equal(*entityTwo.DeletedAt))
+			Expect(gormPost.DeletedAt.Valid).To(BeTrue())
+		})
 
-	It("can transform a gorm into an entity", func() {
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow := time.Now()
-		gormOne := GormPostModel{
-			ID:        faker.UUIDHyphenated(),
-			Text:      text,
-			CreatedAt: timeNow,
-			UpdatedAt: timeNow,
-			DeletedAt: nil,
-		}
+		It("can transform a model into an entity", func() {
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow := time.Now()
+			gormOne := GormPostModel{
+				ID:        faker.UUIDHyphenated(),
+				Text:      text,
+				CreatedAt: timeNow,
+				UpdatedAt: timeNow,
+				DeletedAt: nil,
+			}
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow = time.Now()
-		gormTwo := GormPostModel{
-			ID:        faker.UUIDHyphenated(),
-			Text:      text,
-			CreatedAt: timeNow,
-			UpdatedAt: timeNow,
-			DeletedAt: &gorm.DeletedAt{
-				Time:  timeNow,
-				Valid: true,
-			},
-		}
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow = time.Now()
+			gormTwo := GormPostModel{
+				ID:        faker.UUIDHyphenated(),
+				Text:      text,
+				CreatedAt: timeNow,
+				UpdatedAt: timeNow,
+				DeletedAt: &gorm.DeletedAt{
+					Time:  timeNow,
+					Valid: true,
+				},
+			}
 
-		entityPostOne, err := GormToEntity(&gormOne)
+			entityPostOne, err := GormToEntity(&gormOne)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(entityPostOne).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(entityPostOne).NotTo(BeNil())
 
-		_, err = GormToEntity(&gormTwo)
+			_, err = GormToEntity(&gormTwo)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(entityPostOne.ID.GetId()).To(Equal(gormOne.ID))
-		Expect(entityPostOne.Text.GetText()).To(Equal(gormOne.Text))
-		Expect(entityPostOne.CreatedAt).To(Equal(&gormOne.CreatedAt))
-		Expect(entityPostOne.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
-		Expect(entityPostOne.DeletedAt).To(BeNil())
-	})
+			Expect(entityPostOne.ID.GetId()).To(Equal(gormOne.ID))
+			Expect(entityPostOne.Text.GetText()).To(Equal(gormOne.Text))
+			Expect(entityPostOne.CreatedAt).To(Equal(&gormOne.CreatedAt))
+			Expect(entityPostOne.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
+			Expect(entityPostOne.DeletedAt).To(BeNil())
+		})
 
-	It("can transform a gorm array into an entity array", func() {
-		arrayGormPost := []GormPostModel{}
-		arrayEntityPost, err := ArrayGormToArrayEntity(&arrayGormPost)
+		It("can transform a model array into an entity array", func() {
+			arrayGormPost := []GormPostModel{}
+			arrayEntityPost, err := ArrayGormToArrayEntity(&arrayGormPost)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(arrayEntityPost).NotTo(BeNil())
-		Expect(*arrayEntityPost).To(BeEmpty())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(arrayEntityPost).NotTo(BeNil())
+			Expect(*arrayEntityPost).To(BeEmpty())
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow := time.Now()
-		gormOne := GormPostModel{
-			ID:        faker.UUIDHyphenated(),
-			Text:      text,
-			CreatedAt: timeNow,
-			UpdatedAt: timeNow,
-			DeletedAt: nil,
-		}
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow := time.Now()
+			gormOne := GormPostModel{
+				ID:        faker.UUIDHyphenated(),
+				Text:      text,
+				CreatedAt: timeNow,
+				UpdatedAt: timeNow,
+				DeletedAt: nil,
+			}
 
-		_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-		timeNow = time.Now()
-		gormTwo := GormPostModel{
-			ID:        faker.UUIDHyphenated(),
-			Text:      text,
-			CreatedAt: timeNow,
-			UpdatedAt: timeNow,
-			DeletedAt: &gorm.DeletedAt{
-				Time:  timeNow,
-				Valid: true,
-			},
-		}
+			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
+			timeNow = time.Now()
+			gormTwo := GormPostModel{
+				ID:        faker.UUIDHyphenated(),
+				Text:      text,
+				CreatedAt: timeNow,
+				UpdatedAt: timeNow,
+				DeletedAt: &gorm.DeletedAt{
+					Time:  timeNow,
+					Valid: true,
+				},
+			}
 
-		arrayGormPost = []GormPostModel{gormOne, gormTwo}
-		arrayEntityPost, err = ArrayGormToArrayEntity(&arrayGormPost)
+			arrayGormPost = []GormPostModel{gormOne, gormTwo}
+			arrayEntityPost, err = ArrayGormToArrayEntity(&arrayGormPost)
 
-		Expect(err).NotTo(HaveOccurred())
-		Expect(arrayEntityPost).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
+			Expect(arrayEntityPost).NotTo(BeNil())
 
-		arrayGormPost = []GormPostModel{}
-		_, err = ArrayGormToArrayEntity(&arrayGormPost)
+			arrayGormPost = []GormPostModel{}
+			_, err = ArrayGormToArrayEntity(&arrayGormPost)
 
-		Expect(err).NotTo(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-		entityPost := (*arrayEntityPost)[0]
+			entityPost := (*arrayEntityPost)[0]
 
-		Expect(entityPost.ID.GetId()).To(Equal(gormOne.ID))
-		Expect(entityPost.Text.GetText()).To(Equal(gormOne.Text))
-		Expect(entityPost.CreatedAt).To(Equal(&gormOne.CreatedAt))
-		Expect(entityPost.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
-		Expect(entityPost.DeletedAt).To(BeNil())
+			Expect(entityPost.ID.GetId()).To(Equal(gormOne.ID))
+			Expect(entityPost.Text.GetText()).To(Equal(gormOne.Text))
+			Expect(entityPost.CreatedAt).To(Equal(&gormOne.CreatedAt))
+			Expect(entityPost.UpdatedAt).To(Equal(&gormOne.UpdatedAt))
+			Expect(entityPost.DeletedAt).To(BeNil())
 
-		entityPost = (*arrayEntityPost)[1]
+			entityPost = (*arrayEntityPost)[1]
 
-		Expect(entityPost.ID.GetId()).To(Equal(gormTwo.ID))
-		Expect(entityPost.Text.GetText()).To(Equal(gormTwo.Text))
-		Expect(entityPost.CreatedAt).To(Equal(&gormTwo.CreatedAt))
-		Expect(entityPost.UpdatedAt).To(Equal(&gormTwo.UpdatedAt))
-		Expect(entityPost.DeletedAt).To(Equal(&gormTwo.DeletedAt.Time))
+			Expect(entityPost.ID.GetId()).To(Equal(gormTwo.ID))
+			Expect(entityPost.Text.GetText()).To(Equal(gormTwo.Text))
+			Expect(entityPost.CreatedAt).To(Equal(&gormTwo.CreatedAt))
+			Expect(entityPost.UpdatedAt).To(Equal(&gormTwo.UpdatedAt))
+			Expect(entityPost.DeletedAt).To(Equal(&gormTwo.DeletedAt.Time))
+		})
 	})
 })

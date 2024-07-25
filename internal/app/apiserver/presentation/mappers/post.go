@@ -5,7 +5,11 @@ import (
 	presentationresponses "github.com/fromsi/example/internal/app/apiserver/presentation/responses"
 )
 
-func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) *presentationresponses.Response {
+func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) (*presentationresponses.Response, error) {
+	if post == nil {
+		return nil, nil
+	}
+
 	return &presentationresponses.Response{
 		Data: presentationresponses.PostResponse{
 			ID:        post.Data.ID,
@@ -13,10 +17,14 @@ func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) *presentat
 			CreatedAt: post.Data.CreatedAt,
 			UpdatedAt: post.Data.UpdatedAt,
 		},
-	}
+	}, nil
 }
 
-func ToGinIndexPostResponse(posts *responses.CqrsGetAllQueryResponse) *presentationresponses.ListResponse {
+func ToGinIndexPostResponse(posts *responses.CqrsGetAllQueryResponse) (*presentationresponses.ListResponse, error) {
+	if posts == nil {
+		return nil, nil
+	}
+
 	response := []presentationresponses.PostResponse{}
 
 	for _, post := range (*posts).Data {
@@ -31,5 +39,5 @@ func ToGinIndexPostResponse(posts *responses.CqrsGetAllQueryResponse) *presentat
 	return &presentationresponses.ListResponse{
 		Data:     response,
 		Pageable: presentationresponses.NewPageableResponse(posts.Pageable),
-	}
+	}, nil
 }
