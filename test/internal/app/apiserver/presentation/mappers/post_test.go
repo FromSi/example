@@ -1,4 +1,4 @@
-package filters_test
+package mappers_test
 
 import (
 	. "github.com/fromsi/example/internal/app/apiserver/application/cqrs/responses"

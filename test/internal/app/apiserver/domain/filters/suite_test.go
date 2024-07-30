@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestEntities(t *testing.T) {
+func TestDomainFilters(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Domain Filters")
 }
