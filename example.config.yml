@@ -1,10 +1,15 @@
 app:
   host: localhost
   port: 8080
-database:
+relation_database:
   connection:
     master: sqlite
+    master_orm: gorm
     slave: sqlite
+    slave_orm: gorm
+    test: sqlite
   connections:
     sqlite:
-      dsn: "file::memory:?cache=shared"
+      master_dsn: "file:local.sqlite"
+      slave_dsn: "file:local.sqlite?mode=ro"
+      test_dsn: "file::memory:?cache=shared"
