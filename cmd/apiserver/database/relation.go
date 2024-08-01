@@ -13,6 +13,7 @@ import (
 
 type MasterGormDB *gorm.DB
 type SlaveGormDB *gorm.DB
+type TestGormDB *gorm.DB
 
 const (
 	GormORMType = "gorm"
@@ -27,10 +28,11 @@ type RelationDatabase struct {
 	MasterConnectionType string
 	SlaveORMType         string
 	SlaveConnectionType  string
+	TestConnectionType   string
 	Config               config.Config
 }
 
-func NewFXProvidersRelationDatabase(applicationConfig *config.Config) (fx.Option, error) {
+func NewRelationDatabase(applicationConfig *config.Config) (*RelationDatabase, error) {
 	masterORMType := applicationConfig.RelationDatabase.Connection.MasterORM
 	correctMasterORMType := masterORMType == GormORMType
 
@@ -59,12 +61,28 @@ func NewFXProvidersRelationDatabase(applicationConfig *config.Config) (fx.Option
 		return nil, errors.New("slave connection type is incorrect")
 	}
 
-	database := RelationDatabase{
+	testConnectionType := applicationConfig.RelationDatabase.Connection.Test
+	correctTestConnectionType := testConnectionType == SQLiteDatabaseType
+
+	if !correctTestConnectionType {
+		return nil, errors.New("test connection type is incorrect")
+	}
+
+	return &RelationDatabase{
 		MasterORMType:        masterORMType,
 		MasterConnectionType: masterConnectionType,
 		SlaveORMType:         slaveORMType,
 		SlaveConnectionType:  slaveConnectionType,
+		TestConnectionType:   testConnectionType,
 		Config:               *applicationConfig,
+	}, nil
+}
+
+func NewFXProvidersRelationDatabase(applicationConfig *config.Config) (fx.Option, error) {
+	database, err := NewRelationDatabase(applicationConfig)
+
+	if err != nil {
+		return nil, err
 	}
 
 	fxProvideRepositories, err := database.GetFXProvideRepositories()
@@ -86,6 +104,29 @@ func (database RelationDatabase) GetMasterGormORM() (MasterGormDB, error) {
 	switch database.MasterConnectionType {
 	case SQLiteDatabaseType:
 		dialector = sqlite.Open(database.Config.RelationDatabase.Connections.Sqlite.MasterDSN)
+	}
+
+	databaseGorm, err := gorm.Open(dialector, &gorm.Config{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = databaseGorm.AutoMigrate(&models.GormPostModel{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return databaseGorm, nil
+}
+
+func (database RelationDatabase) GetTestGormORM() (TestGormDB, error) {
+	var dialector gorm.Dialector
+
+	switch database.TestConnectionType {
+	case SQLiteDatabaseType:
+		dialector = sqlite.Open(database.Config.RelationDatabase.Connections.Sqlite.TestDSN)
 	}
 
 	databaseGorm, err := gorm.Open(dialector, &gorm.Config{})
