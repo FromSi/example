@@ -3,25 +3,19 @@ package database
 import (
 	"errors"
 	"github.com/fromsi/example/cmd/apiserver/config"
+	"github.com/fromsi/example/cmd/apiserver/types"
 	domairepository "github.com/fromsi/example/internal/app/apiserver/domain/repositories"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/models"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
 	"go.uber.org/fx"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type MasterGormDB *gorm.DB
 type SlaveGormDB *gorm.DB
 type TestGormDB *gorm.DB
-
-const (
-	GormORMType = "gorm"
-)
-
-const (
-	SQLiteDatabaseType = "sqlite"
-)
 
 type RelationDatabase struct {
 	MasterORMType        string
@@ -34,35 +28,35 @@ type RelationDatabase struct {
 
 func NewRelationDatabase(applicationConfig *config.Config) (*RelationDatabase, error) {
 	masterORMType := applicationConfig.RelationDatabase.Connection.MasterORM
-	correctMasterORMType := masterORMType == GormORMType
+	correctMasterORMType := masterORMType == types.DatabaseGormORMType
 
 	if !correctMasterORMType {
 		return nil, errors.New("master orm type is incorrect")
 	}
 
 	masterConnectionType := applicationConfig.RelationDatabase.Connection.Master
-	correctMasterConnectionType := masterConnectionType == SQLiteDatabaseType
+	correctMasterConnectionType := masterConnectionType == types.DatabaseSQLiteDatabaseType
 
 	if !correctMasterConnectionType {
 		return nil, errors.New("master connection type is incorrect")
 	}
 
 	slaveORMType := applicationConfig.RelationDatabase.Connection.SlaveORM
-	correctSlaveORMType := slaveORMType == GormORMType
+	correctSlaveORMType := slaveORMType == types.DatabaseGormORMType
 
 	if !correctSlaveORMType {
 		return nil, errors.New("slave orm type is incorrect")
 	}
 
 	slaveConnectionType := applicationConfig.RelationDatabase.Connection.Slave
-	correctSlaveConnectionType := slaveConnectionType == SQLiteDatabaseType
+	correctSlaveConnectionType := slaveConnectionType == types.DatabaseSQLiteDatabaseType
 
 	if !correctSlaveConnectionType {
 		return nil, errors.New("slave connection type is incorrect")
 	}
 
 	testConnectionType := applicationConfig.RelationDatabase.Connection.Test
-	correctTestConnectionType := testConnectionType == SQLiteDatabaseType
+	correctTestConnectionType := testConnectionType == types.DatabaseSQLiteDatabaseType
 
 	if !correctTestConnectionType {
 		return nil, errors.New("test connection type is incorrect")
@@ -102,11 +96,14 @@ func (database RelationDatabase) GetMasterGormORM() (MasterGormDB, error) {
 	var dialector gorm.Dialector
 
 	switch database.MasterConnectionType {
-	case SQLiteDatabaseType:
+	case types.DatabaseSQLiteDatabaseType:
 		dialector = sqlite.Open(database.Config.RelationDatabase.Connections.Sqlite.MasterDSN)
 	}
 
-	databaseGorm, err := gorm.Open(dialector, &gorm.Config{})
+	databaseGorm, err := gorm.Open(dialector, &gorm.Config{
+		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Silent),
+	})
 
 	if err != nil {
 		return nil, err
@@ -125,11 +122,14 @@ func (database RelationDatabase) GetTestGormORM() (TestGormDB, error) {
 	var dialector gorm.Dialector
 
 	switch database.TestConnectionType {
-	case SQLiteDatabaseType:
+	case types.DatabaseSQLiteDatabaseType:
 		dialector = sqlite.Open(database.Config.RelationDatabase.Connections.Sqlite.TestDSN)
 	}
 
-	databaseGorm, err := gorm.Open(dialector, &gorm.Config{})
+	databaseGorm, err := gorm.Open(dialector, &gorm.Config{
+		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Silent),
+	})
 
 	if err != nil {
 		return nil, err
@@ -148,11 +148,14 @@ func (database RelationDatabase) GetSlaveGormORM() (SlaveGormDB, error) {
 	var dialector gorm.Dialector
 
 	switch database.SlaveConnectionType {
-	case SQLiteDatabaseType:
+	case types.DatabaseSQLiteDatabaseType:
 		dialector = sqlite.Open(database.Config.RelationDatabase.Connections.Sqlite.SlaveDSN)
 	}
 
-	databaseGorm, err := gorm.Open(dialector, &gorm.Config{})
+	databaseGorm, err := gorm.Open(dialector, &gorm.Config{
+		SkipDefaultTransaction: true,
+		Logger:                 logger.Default.LogMode(logger.Silent),
+	})
 
 	if err != nil {
 		return nil, err
@@ -165,7 +168,7 @@ func (database RelationDatabase) GetFXProvideRepositories() (fx.Option, error) {
 	var providers []fx.Option
 
 	switch database.MasterORMType {
-	case GormORMType:
+	case types.DatabaseGormORMType:
 		masterDatabase, err := database.GetMasterGormORM()
 
 		if err != nil {
@@ -186,7 +189,7 @@ func (database RelationDatabase) GetFXProvideRepositories() (fx.Option, error) {
 	}
 
 	switch database.SlaveORMType {
-	case GormORMType:
+	case types.DatabaseGormORMType:
 		slaveDatabase, err := database.GetSlaveGormORM()
 
 		if err != nil {

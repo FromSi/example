@@ -10,6 +10,7 @@ type MutablePostRepository interface {
 	UpdateById(string, *entities.Post) error
 	DeleteById(string) error
 	RestoreById(string) error
+	Truncate() error
 }
 
 type QueryPostRepository interface {

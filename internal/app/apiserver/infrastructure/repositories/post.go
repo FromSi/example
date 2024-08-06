@@ -1,7 +1,9 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
+	"github.com/fromsi/example/cmd/apiserver/types"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/domain/filters"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/mappers"
@@ -106,4 +108,24 @@ func (repository *GormPostRepository) DeleteById(id string) error {
 
 func (repository *GormPostRepository) RestoreById(id string) error {
 	return repository.Database.Unscoped().Model(&models.GormPostModel{ID: id}).Update("deleted_at", nil).Error
+}
+
+func (repository *GormPostRepository) Truncate() error {
+	statement := &gorm.Statement{DB: repository.Database}
+	err := statement.Parse(&models.GormPostModel{})
+
+	if err != nil {
+		return err
+	}
+
+	tableName := statement.Schema.Table
+
+	switch repository.Database.Name() {
+	case types.DatabaseSQLiteDatabaseType:
+		repository.Database.Exec(fmt.Sprintf("DELETE FROM %s", tableName))
+	default:
+		return errors.New("database type is not found")
+	}
+
+	return nil
 }

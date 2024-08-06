@@ -59,25 +59,13 @@ func (handler UpdatePostCommandHandler) Handle(command Command) error {
 		return errors.New("invalid command type")
 	}
 
-	idValueObject, err := entities.NewId(commandImplementation.ID)
+	post, err := entities.NewPost(commandImplementation.ID, *commandImplementation.Text, nil, nil, nil)
 
 	if err != nil {
 		return err
 	}
 
-	post := entities.Post{ID: *idValueObject}
-
-	if commandImplementation.Text != nil {
-		textValueObject, err := entities.NewText(*commandImplementation.Text)
-
-		if err != nil {
-			return err
-		}
-
-		post.Text = *textValueObject
-	}
-
-	err = handler.MutableRepository.PostRepository.UpdateById(commandImplementation.ID, &post)
+	err = handler.MutableRepository.PostRepository.UpdateById(commandImplementation.ID, post)
 
 	if err != nil {
 		return err

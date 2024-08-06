@@ -12,3 +12,7 @@ type GormPostModel struct {
 	UpdatedAt time.Time
 	DeletedAt *gorm.DeletedAt `gorm:"index"`
 }
+
+func (GormPostModel) TableName() string {
+	return "post"
+}
