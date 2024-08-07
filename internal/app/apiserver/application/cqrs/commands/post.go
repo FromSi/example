@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
-	"github.com/google/uuid"
 )
 
 type CreatePostCommand struct {
@@ -22,13 +21,7 @@ func (handler CreatePostCommandHandler) Handle(command Command) error {
 		return errors.New("invalid command type")
 	}
 
-	id, err := uuid.NewRandom()
-
-	if err != nil {
-		return err
-	}
-
-	post, err := entities.NewPost(id.String(), commandImplementation.Text, nil, nil, nil)
+	post, err := entities.NewPost("", commandImplementation.Text, nil, nil, nil)
 
 	if err != nil {
 		return err
