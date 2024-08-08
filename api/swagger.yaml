@@ -14,6 +14,11 @@ servers:
   - url: localhost:8080
     description: make run
 tags:
+  - name: auth
+    description: Authorization User
+    externalDocs:
+      url: https://github.com/FromSi/example/blob/master/internal/app/apiserver/presentation/controllers/auth.go
+      description: Go Controllers
   - name: user
     description: User Profiles
     externalDocs:
@@ -25,11 +30,11 @@ tags:
       url: https://github.com/FromSi/example/blob/master/internal/app/apiserver/presentation/controllers/post.go
       description: Go Controllers
 paths:
-  /login:
+  /auth/login:
     get:
       summary: Get Mnemonic For Login
       tags:
-        - user
+        - auth
       responses:
         '200':
           description: Successful
@@ -48,32 +53,194 @@ paths:
                       mnemonic:
                         type: string
                         format: bip39_mnemonic
-                        example: 'pink deliver evidence assist client much wreck arctic force choice tobacco nation film taxi track'
-    post:
-      summary: LogIn Or SignUp
-      tags:
-        - user
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - text
-              properties:
-                mnemonic:
-                  type: string
-                  format: bip39_mnemonic
-                  example: 'pink deliver evidence assist client much wreck arctic force choice tobacco nation film taxi track'
-      responses:
-        '200':
-          description: Successful
+                        example: 'number orphan liquid radio tray stadium they dune female sheriff tourist talent'
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    post:
+      summary: LogIn Or SignUp
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mnemonic:
+                  type: string
+                  format: bip39_mnemonic
+                  example: 'number orphan liquid radio tray stadium they dune female sheriff tourist talent'
+                refresh_token:
+                  type: string
+                  format: uuid
+                  example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - access_token
+                      - refresh_token
+                    properties:
+                      token_type:
+                        type: string
+                        format: string
+                        example: bearer
+                        enum:
+                          - bearer
+                      access_token:
+                        type: string
+                        format: jwt_hs256
+                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJleGFtcGxlIiwiYXVkIjoidXNlciIsInN1YiI6ImJjMXFmcG12N3kydnI2dGs1MHZ4bHlodHA2cGh6MHp0cnFtc2Fud2E2dCIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNTE2MzAwMDAwfQ.GWtkHCOw1bl6PjwPdSDqwRDi_5bXz4w6tSHzkTVWkQ0'
+                      refresh_token:
+                        type: string
+                        format: uuid
+                        example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+                      expires_in:
+                        type: integer
+                        format: unix
+                        example: 1516300000
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/sessions:
+    get:
+      summary: Get User Sessions
+      tags:
+        - auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - id
+                      - agent
+                      - ip
+                      - created_at
+                      - updated_at
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                        example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+                      agent:
+                        type: string
+                        format: text
+                        example: 'Mozilla/5.0 (X11; Linux x86_64; rv:121.0)'
+                      ip:
+                        type: string
+                        format: text
+                        example: '1.1.1.1'
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: 2024-07-16T21:31:26.335809566+05:00
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: 2024-07-16T21:31:26.335809566+05:00
+  /auth/revoke:
+    post:
+      summary: Revoke User Session
+      tags:
+        - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_id:
+                  type: string
+                  format: uuid
+                  example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+                refresh_token:
+                  type: string
+                  format: uuid
+                  example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+      responses:
+        '200':
+          description: Successful
+  /users/my:
+    get:
+      summary: Get The Profile Of The Current User
+      tags:
+        - user
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - id
+                    properties:
+                      id:
+                        type: string
+                        format: bech32
+                        example: 'bc1qfpmv7y2vr6tk50vxlyhtp6phz0ztrqmsanwa6t'
+  /users/{id}:
+    get:
+      summary: Get The Profile Of The Current User
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bech32Query'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - id
+                    properties:
+                      id:
+                        type: string
+                        format: bech32
+                        example: 'bc1qfpmv7y2vr6tk50vxlyhtp6phz0ztrqmsanwa6t'
   /posts:
     post:
       summary: Create New Post
@@ -147,7 +314,7 @@ paths:
                         id:
                           type: string
                           format: uuid
-                          example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+                          example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
                         text:
                           type: string
                           format: text
@@ -203,7 +370,7 @@ paths:
                       id:
                         type: string
                         format: uuid
-                        example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+                        example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
                       text:
                         type: string
                         format: text
@@ -297,6 +464,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Error:
       type: object
@@ -354,7 +526,11 @@ components:
     UUIDQuery:
       type: string
       format: uuid
-      example: 09d0ce56-33ab-4fce-90bb-d2b4d6d844ba
+      example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+    Bech32Query:
+      type: string
+      format: bech32
+      example: 'bc1qfpmv7y2vr6tk50vxlyhtp6phz0ztrqmsanwa6t'
     PageQuery:
       type: integer
       format: int64
