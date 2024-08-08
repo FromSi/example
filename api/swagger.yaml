@@ -14,12 +14,66 @@ servers:
   - url: localhost:8080
     description: make run
 tags:
+  - name: user
+    description: User Profiles
+    externalDocs:
+      url: https://github.com/FromSi/example/blob/master/internal/app/apiserver/presentation/controllers/user.go
+      description: Go Controllers
   - name: post
     description: User Posts To Provide Information
     externalDocs:
       url: https://github.com/FromSi/example/blob/master/internal/app/apiserver/presentation/controllers/post.go
       description: Go Controllers
 paths:
+  /login:
+    get:
+      summary: Get Mnemonic For Login
+      tags:
+        - user
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - mnemonic
+                    properties:
+                      mnemonic:
+                        type: string
+                        format: bip39_mnemonic
+                        example: 'pink deliver evidence assist client much wreck arctic force choice tobacco nation film taxi track'
+    post:
+      summary: LogIn Or SignUp
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - text
+              properties:
+                mnemonic:
+                  type: string
+                  format: bip39_mnemonic
+                  example: 'pink deliver evidence assist client much wreck arctic force choice tobacco nation film taxi track'
+      responses:
+        '200':
+          description: Successful
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /posts:
     post:
       summary: Create New Post
