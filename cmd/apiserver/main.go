@@ -59,6 +59,14 @@ func NewApplication(config *config.Config, commandCQRS cqrs.CommandCQRS, queryCQ
 func (application Application) Run() error {
 	route := gin.Default()
 
+	authController := controllers.GinAuthController{
+		Engine:      route,
+		CommandCQRS: &application.CommandCQRS,
+		QueryCQRS:   &application.QueryCQRS,
+	}
+
+	route.GET("/auth/login", authController.ShowLogin)
+
 	postController := controllers.GinPostController{
 		Engine:      route,
 		CommandCQRS: &application.CommandCQRS,

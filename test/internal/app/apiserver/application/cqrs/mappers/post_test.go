@@ -34,13 +34,13 @@ var _ = Describe("Post", func() {
 	})
 
 	It("can transform an nil into nil", func() {
-		findByIdQueryResponse, err := ToCqrsFindByIdQueryResponse(nil)
+		findByIdQueryResponse, err := ToFindByIdPostQueryResponse(nil)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(findByIdQueryResponse).To(BeNil())
 	})
 
-	It("can transform an entity into get_all_query_response", func() {
+	It("can transform an entity into ToGetAllPostQueryResponse", func() {
 		entities := []Post{}
 		entityPageableOne, err := NewEntityPageable(
 			MinPageOrder,
@@ -58,12 +58,12 @@ var _ = Describe("Post", func() {
 
 		entities = []Post{*entityOne, *entityTwo}
 
-		response, err := ToCqrsGetAllQueryResponse(&entities, entityPageableOne)
+		response, err := ToGetAllPostQueryResponse(&entities, entityPageableOne)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
 
-		_, err = ToCqrsGetAllQueryResponse(&entities, entityPageableTwo)
+		_, err = ToGetAllPostQueryResponse(&entities, entityPageableTwo)
 
 		Expect(err).NotTo(HaveOccurred())
 
@@ -80,13 +80,13 @@ var _ = Describe("Post", func() {
 		Expect(response.Pageable).To(Equal(entityPageableOne))
 	})
 
-	It("can transform an entity into find_by_id_query_response", func() {
-		response, err := ToCqrsFindByIdQueryResponse(entityOne)
+	It("can transform an entity into ToFindByIdPostQueryResponse", func() {
+		response, err := ToFindByIdPostQueryResponse(entityOne)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(response).NotTo(BeNil())
 
-		_, err = ToCqrsFindByIdQueryResponse(entityTwo)
+		_, err = ToFindByIdPostQueryResponse(entityTwo)
 
 		Expect(err).NotTo(HaveOccurred())
 

@@ -8,20 +8,20 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/infrastructure/repositories"
 )
 
-type GetAllQuery struct {
+type GetAllPostQuery struct {
 	Pageable entities.Pageable
 	Sortable entities.Sortable
 }
 
-type GetAllQueryHandler struct {
+type GetAllPostQueryHandler struct {
 	QueryRepository *repositories.QueryRepository
 }
 
-func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
-	queryImplementation, exists := query.(GetAllQuery)
+func (handler GetAllPostQueryHandler) Handle(query Query) (any, error) {
+	queryImplementation, exists := query.(GetAllPostQuery)
 
 	if !exists {
-		return nil, errors.New("invalid command type")
+		return nil, errors.New("invalid query type")
 	}
 
 	posts, err := handler.QueryRepository.PostRepository.GetAll(queryImplementation.Pageable, queryImplementation.Sortable)
@@ -42,7 +42,7 @@ func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
 		return nil, err
 	}
 
-	response, err := mappers.ToCqrsGetAllQueryResponse(posts, queryImplementation.Pageable)
+	response, err := mappers.ToGetAllPostQueryResponse(posts, queryImplementation.Pageable)
 
 	if err != nil {
 		return nil, err
@@ -51,19 +51,19 @@ func (handler GetAllQueryHandler) Handle(query Query) (any, error) {
 	return response, nil
 }
 
-type FindByIdQuery struct {
+type FindByIdPostQuery struct {
 	ID string
 }
 
-type FindByIdQueryHandler struct {
+type FindByIdPostQueryHandler struct {
 	QueryRepository *repositories.QueryRepository
 }
 
-func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
-	queryImplementation, exists := query.(FindByIdQuery)
+func (handler FindByIdPostQueryHandler) Handle(query Query) (any, error) {
+	queryImplementation, exists := query.(FindByIdPostQuery)
 
 	if !exists {
-		return nil, errors.New("invalid command type")
+		return nil, errors.New("invalid query type")
 	}
 
 	findPostFilter, err := filters.NewFindPostFilter(queryImplementation.ID)
@@ -78,7 +78,7 @@ func (handler FindByIdQueryHandler) Handle(query Query) (any, error) {
 		return nil, err
 	}
 
-	response, err := mappers.ToCqrsFindByIdQueryResponse(post)
+	response, err := mappers.ToFindByIdPostQueryResponse(post)
 
 	if err != nil {
 		return nil, err

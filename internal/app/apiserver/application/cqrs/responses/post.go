@@ -5,19 +5,19 @@ import (
 	"time"
 )
 
-type QueryResponse struct {
+type PostQueryResponse struct {
 	ID        string
 	Text      string
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 }
 
-type CqrsGetAllQueryResponse struct {
-	Data     []QueryResponse
+type GetAllPostQueryResponse struct {
+	Data     []PostQueryResponse
 	Pageable entities.Pageable
 }
 
-type CqrsFindByIdQueryResponse struct {
-	Data      QueryResponse
+type FindByIdPostQueryResponse struct {
+	Data      PostQueryResponse
 	IsDeleted bool
 }

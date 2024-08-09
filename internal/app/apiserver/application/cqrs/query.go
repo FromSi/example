@@ -30,10 +30,12 @@ func (cqrs *DefaultQueryCQRS) Ask(query queries.Query) (any, error) {
 
 func getQueryHandler(query queries.Query, cqrs *DefaultQueryCQRS) (queries.QueryHandler, error) {
 	switch query.(type) {
-	case queries.GetAllQuery:
-		return &queries.GetAllQueryHandler{QueryRepository: cqrs.QueryRepository}, nil
-	case queries.FindByIdQuery:
-		return &queries.FindByIdQueryHandler{QueryRepository: cqrs.QueryRepository}, nil
+	case queries.GetAllPostQuery:
+		return &queries.GetAllPostQueryHandler{QueryRepository: cqrs.QueryRepository}, nil
+	case queries.FindByIdPostQuery:
+		return &queries.FindByIdPostQueryHandler{QueryRepository: cqrs.QueryRepository}, nil
+	case queries.GetMnemonicAuthQuery:
+		return &queries.GetMnemonicAuthQueryHandler{QueryRepository: cqrs.QueryRepository}, nil
 	}
 
 	return nil, errors.New("query handler not found")

@@ -34,8 +34,8 @@ var _ = Describe("Post", func() {
 		It("can transform a query response into a response", func() {
 			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
 			timeNow := time.Now()
-			queryResponseOne := CqrsFindByIdQueryResponse{
-				Data: QueryResponse{
+			queryResponseOne := FindByIdPostQueryResponse{
+				Data: PostQueryResponse{
 					ID:        faker.UUIDHyphenated(),
 					Text:      text,
 					CreatedAt: &timeNow,
@@ -45,8 +45,8 @@ var _ = Describe("Post", func() {
 			}
 
 			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-			queryResponseTwo := CqrsFindByIdQueryResponse{
-				Data: QueryResponse{
+			queryResponseTwo := FindByIdPostQueryResponse{
+				Data: PostQueryResponse{
 					ID:        faker.UUIDHyphenated(),
 					Text:      text,
 					CreatedAt: nil,
@@ -77,7 +77,7 @@ var _ = Describe("Post", func() {
 		It("can transform a query response into a response", func() {
 			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
 			timeNow := time.Now()
-			dataResponseOne := QueryResponse{
+			dataResponseOne := PostQueryResponse{
 				ID:        faker.UUIDHyphenated(),
 				Text:      text,
 				CreatedAt: &timeNow,
@@ -85,7 +85,7 @@ var _ = Describe("Post", func() {
 			}
 
 			_ = faker.FakeData(&text, options.WithRandomStringLength(textLength))
-			dataResponseTwo := QueryResponse{
+			dataResponseTwo := PostQueryResponse{
 				ID:        faker.UUIDHyphenated(),
 				Text:      text,
 				CreatedAt: nil,
@@ -95,13 +95,13 @@ var _ = Describe("Post", func() {
 			pageableOne, _ := NewEntityPageable(MinPageOrder, MaxLimitItems, rand.Intn(100)+MinTotalItems)
 			pageableTwo, _ := NewEntityPageable(rand.Intn(100)+MinPageOrder, MinLimitItems, MinTotalItems)
 
-			responseOne := CqrsGetAllQueryResponse{
-				Data:     []QueryResponse{dataResponseOne, dataResponseTwo},
+			responseOne := GetAllPostQueryResponse{
+				Data:     []PostQueryResponse{dataResponseOne, dataResponseTwo},
 				Pageable: pageableOne,
 			}
 
-			responseTwo := CqrsGetAllQueryResponse{
-				Data:     []QueryResponse{},
+			responseTwo := GetAllPostQueryResponse{
+				Data:     []PostQueryResponse{},
 				Pageable: pageableTwo,
 			}
 

@@ -5,7 +5,7 @@ import (
 	presentationresponses "github.com/fromsi/example/internal/app/apiserver/presentation/responses"
 )
 
-func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) (*presentationresponses.Response, error) {
+func ToGinShowPostResponse(post *responses.FindByIdPostQueryResponse) (*presentationresponses.Response, error) {
 	if post == nil {
 		return nil, nil
 	}
@@ -20,7 +20,7 @@ func ToGinShowPostResponse(post *responses.CqrsFindByIdQueryResponse) (*presenta
 	}, nil
 }
 
-func ToGinIndexPostResponse(posts *responses.CqrsGetAllQueryResponse) (*presentationresponses.ListResponse, error) {
+func ToGinIndexPostResponse(posts *responses.GetAllPostQueryResponse) (*presentationresponses.ListResponse, error) {
 	if posts == nil {
 		return nil, nil
 	}

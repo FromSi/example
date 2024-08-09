@@ -5,7 +5,7 @@ import (
 	"github.com/fromsi/example/internal/app/apiserver/domain/entities"
 )
 
-func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageable) (*responses.CqrsGetAllQueryResponse, error) {
+func ToGetAllPostQueryResponse(posts *[]entities.Post, pageable entities.Pageable) (*responses.GetAllPostQueryResponse, error) {
 	if pageable == nil {
 		entityPageable, err := entities.NewEntityPageable(
 			entities.MinPageOrder,
@@ -20,7 +20,7 @@ func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageabl
 		pageable = entityPageable
 	}
 
-	response := responses.CqrsGetAllQueryResponse{
+	response := responses.GetAllPostQueryResponse{
 		Pageable: pageable,
 	}
 
@@ -29,7 +29,7 @@ func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageabl
 	}
 
 	for _, post := range *posts {
-		response.Data = append(response.Data, responses.QueryResponse{
+		response.Data = append(response.Data, responses.PostQueryResponse{
 			ID:        post.ID.GetId(),
 			Text:      post.Text.GetText(),
 			CreatedAt: post.CreatedAt,
@@ -40,13 +40,13 @@ func ToCqrsGetAllQueryResponse(posts *[]entities.Post, pageable entities.Pageabl
 	return &response, nil
 }
 
-func ToCqrsFindByIdQueryResponse(post *entities.Post) (*responses.CqrsFindByIdQueryResponse, error) {
+func ToFindByIdPostQueryResponse(post *entities.Post) (*responses.FindByIdPostQueryResponse, error) {
 	if post == nil {
 		return nil, nil
 	}
 
-	response := responses.CqrsFindByIdQueryResponse{
-		Data: responses.QueryResponse{
+	response := responses.FindByIdPostQueryResponse{
+		Data: responses.PostQueryResponse{
 			ID:        post.ID.GetId(),
 			Text:      post.Text.GetText(),
 			CreatedAt: post.CreatedAt,

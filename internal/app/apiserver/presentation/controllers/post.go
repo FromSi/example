@@ -95,7 +95,7 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllQuery{Pageable: pageable, Sortable: sortable})
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.GetAllPostQuery{Pageable: pageable, Sortable: sortable})
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, presentationresponses.Response{
@@ -109,12 +109,12 @@ func (controller GinPostController) Index(context *gin.Context) {
 		return
 	}
 
-	postQueryResponseImplementation, exists := postQueryResponse.(*responses.CqrsGetAllQueryResponse)
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.GetAllPostQueryResponse)
 
 	if !exists {
 		context.Status(http.StatusNotFound)
 
-		log.Println("invalid command type")
+		log.Println("invalid query type")
 
 		return
 	}
@@ -151,7 +151,7 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.FindByIdQuery{ID: request.ID})
+	postQueryResponse, err := (*controller.QueryCQRS).Ask(queries.FindByIdPostQuery{ID: request.ID})
 
 	if err != nil {
 		context.Status(http.StatusNotFound)
@@ -161,12 +161,12 @@ func (controller GinPostController) Show(context *gin.Context) {
 		return
 	}
 
-	postQueryResponseImplementation, exists := postQueryResponse.(*responses.CqrsFindByIdQueryResponse)
+	postQueryResponseImplementation, exists := postQueryResponse.(*responses.FindByIdPostQueryResponse)
 
 	if !exists {
 		context.Status(http.StatusNotFound)
 
-		log.Println("invalid command type")
+		log.Println("invalid query type")
 
 		return
 	}
