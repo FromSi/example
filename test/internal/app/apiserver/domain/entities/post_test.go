@@ -11,13 +11,12 @@ import (
 )
 
 var _ = Describe("Post", func() {
-	var textOne string
-	var textTwo string
-	var err error
-
-	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
+	textLength := uint(rand.Intn(TextPostMaxLength-TextPostMinLength+1) + TextPostMinLength)
 
 	It("can make a post", func() {
+		var textOne string
+		var textTwo string
+
 		_ = faker.FakeData(&textOne, options.WithRandomStringLength(textLength))
 		timeNowOne := time.Now()
 		post, err := NewPost("", textOne, &timeNowOne, &timeNowOne, &timeNowOne)
@@ -37,10 +36,12 @@ var _ = Describe("Post", func() {
 		Expect(post.DeletedAt).To(Equal(&timeNowOne))
 	})
 
-	It("can change the textOne of the post", func() {
-		id := faker.UUIDHyphenated()
+	It("can change the text of the post", func() {
+		var textOne string
+		var textTwo string
+
 		_ = faker.FakeData(&textOne, options.WithRandomStringLength(textLength))
-		post, err := NewPost(id, textOne, nil, nil, nil)
+		post, err := NewPost("", textOne, nil, nil, nil)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(post).NotTo(BeNil())
@@ -56,8 +57,9 @@ var _ = Describe("Post", func() {
 
 	Describe("ID Value Object", func() {
 		var idValueObject *IdPost
+		var err error
 
-		It("can make a id", func() {
+		It("can make correctly an id", func() {
 			idValueObject, err = NewIdPost("")
 
 			Expect(err).NotTo(HaveOccurred())
@@ -84,21 +86,24 @@ var _ = Describe("Post", func() {
 	})
 
 	Describe("Text Value Object", func() {
+		var textOne string
+		var textTwo string
 		var textValueObject *TextPost
+		var err error
 
-		It("can make a textOne", func() {
+		It("can make correctly a text", func() {
 			textValueObject, err = NewTextPost("")
 
 			Expect(err).To(HaveOccurred())
 			Expect(textValueObject).To(BeNil())
 
-			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextMinLength-1))
+			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextPostMinLength-1))
 			textValueObject, err = NewTextPost(textOne)
 
 			Expect(err).To(HaveOccurred())
 			Expect(textValueObject).To(BeNil())
 
-			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextMaxLength+1))
+			_ = faker.FakeData(&textOne, options.WithRandomStringLength(TextPostMaxLength+1))
 			textValueObject, err = NewTextPost(textOne)
 
 			Expect(err).To(HaveOccurred())

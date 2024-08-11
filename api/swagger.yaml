@@ -148,6 +148,10 @@ paths:
                         type: string
                         format: uuid
                         example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
+                      user_id:
+                        type: string
+                        format: bech32
+                        example: 'bc1qfpmv7y2vr6tk50vxlyhtp6phz0ztrqmsanwa6t'
                       agent:
                         type: string
                         format: text
@@ -156,6 +160,10 @@ paths:
                         type: string
                         format: text
                         example: '1.1.1.1'
+                      expired_at:
+                        type: string
+                        format: date-time
+                        example: 2024-07-16T21:31:26.335809566+05:00
                       created_at:
                         type: string
                         format: date-time

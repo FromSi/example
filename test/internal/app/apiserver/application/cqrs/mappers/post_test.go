@@ -16,7 +16,7 @@ var _ = Describe("Post", func() {
 	var entityTwo *Post
 	var err error
 
-	textLength := uint(rand.Intn(TextMaxLength-TextMinLength+1) + TextMinLength)
+	textLength := uint(rand.Intn(TextPostMaxLength-TextPostMinLength+1) + TextPostMinLength)
 
 	BeforeEach(func() {
 		var text string

@@ -33,7 +33,7 @@ var _ = Describe("User", func() {
 	Describe("ID Value Object", func() {
 		var idValueObject *IdUser
 
-		It("can make a id", func() {
+		It("can make correctly an id", func() {
 			idValueObject, err = NewIdUser("")
 
 			Expect(err).NotTo(HaveOccurred())

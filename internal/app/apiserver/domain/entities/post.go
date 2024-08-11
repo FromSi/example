@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	TextMinLength = 3
-	TextMaxLength = 250
+	TextPostMinLength = 3
+	TextPostMaxLength = 255
 )
 
 var (
@@ -109,7 +109,7 @@ type TextPost struct {
 }
 
 func NewTextPost(text string) (*TextPost, error) {
-	err := validate.Var(text, fmt.Sprintf("required,gte=%d,lte=%d", TextMinLength, TextMaxLength))
+	err := validate.Var(text, fmt.Sprintf("required,gte=%d,lte=%d", TextPostMinLength, TextPostMaxLength))
 
 	if err != nil {
 		return nil, err
