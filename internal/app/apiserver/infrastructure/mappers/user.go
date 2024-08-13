@@ -7,14 +7,13 @@ import (
 	"time"
 )
 
-func EntityToGormPost(entity *entities.Post) (*models.GormPostModel, error) {
+func EntityToGormUser(entity *entities.User) (*models.GormUserModel, error) {
 	if entity == nil {
 		return nil, nil
 	}
 
-	model := models.GormPostModel{
+	model := models.GormUserModel{
 		ID:        entity.ID.GetId(),
-		Text:      entity.Text.GetText(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -37,15 +36,15 @@ func EntityToGormPost(entity *entities.Post) (*models.GormPostModel, error) {
 	return &model, nil
 }
 
-func ArrayEntityToArrayGormPost(entitySlice *[]entities.Post) (*[]models.GormPostModel, error) {
+func ArrayEntityToArrayGormUser(entitySlice *[]entities.User) (*[]models.GormUserModel, error) {
 	if entitySlice == nil {
 		return nil, nil
 	}
 
-	modelSlice := []models.GormPostModel{}
+	modelSlice := []models.GormUserModel{}
 
 	for _, item := range *entitySlice {
-		model, err := EntityToGormPost(&item)
+		model, err := EntityToGormUser(&item)
 
 		if err != nil {
 			return nil, err
@@ -57,7 +56,7 @@ func ArrayEntityToArrayGormPost(entitySlice *[]entities.Post) (*[]models.GormPos
 	return &modelSlice, nil
 }
 
-func GormToEntityPost(model *models.GormPostModel) (*entities.Post, error) {
+func GormToEntityUser(model *models.GormUserModel) (*entities.User, error) {
 	if model == nil {
 		return nil, nil
 	}
@@ -72,7 +71,7 @@ func GormToEntityPost(model *models.GormPostModel) (*entities.Post, error) {
 		deletedAt = &deletedAtCopy
 	}
 
-	entity, err := entities.NewPost(model.ID, model.Text, &createdAtCopy, &updatedAtCopy, deletedAt)
+	entity, err := entities.NewUser(model.ID, &createdAtCopy, &updatedAtCopy, deletedAt)
 
 	if err != nil {
 		return nil, err
@@ -81,15 +80,15 @@ func GormToEntityPost(model *models.GormPostModel) (*entities.Post, error) {
 	return entity, nil
 }
 
-func ArrayGormToArrayEntityPost(modelSlice *[]models.GormPostModel) (*[]entities.Post, error) {
+func ArrayGormToArrayEntityUser(modelSlice *[]models.GormUserModel) (*[]entities.User, error) {
 	if modelSlice == nil {
 		return nil, nil
 	}
 
-	entitySlice := []entities.Post{}
+	entitySlice := []entities.User{}
 
 	for _, item := range *modelSlice {
-		entity, err := GormToEntityPost(&item)
+		entity, err := GormToEntityUser(&item)
 
 		if err != nil {
 			return nil, err

@@ -11,3 +11,11 @@ func ToGetMnemonicAuthQueryResponse(mnemonic string) (*responses.GetMnemonicAuth
 
 	return &response, nil
 }
+
+func ToGetAddressFromMnemonicAuthQueryResponse(address string) (*responses.GetAddressFromMnemonicAuthQueryResponse, error) {
+	response := responses.GetAddressFromMnemonicAuthQueryResponse{
+		Address: address,
+	}
+
+	return &response, nil
+}

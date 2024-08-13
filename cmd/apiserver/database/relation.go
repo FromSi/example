@@ -109,7 +109,7 @@ func (database RelationDatabase) GetMasterGormORM() (MasterGormDB, error) {
 		return nil, err
 	}
 
-	err = databaseGorm.AutoMigrate(&models.GormPostModel{})
+	err = databaseGorm.AutoMigrate(&models.GormPostModel{}, &models.GormUserModel{})
 
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (database RelationDatabase) GetTestGormORM() (TestGormDB, error) {
 		return nil, err
 	}
 
-	err = databaseGorm.AutoMigrate(&models.GormPostModel{})
+	err = databaseGorm.AutoMigrate(&models.GormPostModel{}, &models.GormUserModel{})
 
 	if err != nil {
 		return nil, err
@@ -184,6 +184,12 @@ func (database RelationDatabase) GetFXProvideRepositories() (fx.Option, error) {
 					},
 					fx.As(new(domairepository.MutablePostRepository)),
 				),
+				fx.Annotate(
+					func(db MasterGormDB) *repositories.GormUserRepository {
+						return repositories.NewGormUserRepository(db)
+					},
+					fx.As(new(domairepository.MutableUserRepository)),
+				),
 			),
 		))
 	}
@@ -204,6 +210,12 @@ func (database RelationDatabase) GetFXProvideRepositories() (fx.Option, error) {
 						return repositories.NewGormPostRepository(db)
 					},
 					fx.As(new(domairepository.QueryPostRepository)),
+				),
+				fx.Annotate(
+					func(db SlaveGormDB) *repositories.GormUserRepository {
+						return repositories.NewGormUserRepository(db)
+					},
+					fx.As(new(domairepository.QueryUserRepository)),
 				),
 			),
 		))

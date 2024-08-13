@@ -20,22 +20,22 @@ var _ = Describe("Post", func() {
 
 	Describe("Gorm", func() {
 		It("can transform an nil into nil", func() {
-			gormPostOne, err := ArrayEntityToArrayGorm(nil)
+			gormPostOne, err := ArrayEntityToArrayGormPost(nil)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(gormPostOne).To(BeNil())
 
-			gormPostTwo, err := EntityToGorm(nil)
+			gormPostTwo, err := EntityToGormPost(nil)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(gormPostTwo).To(BeNil())
 
-			entityPostOne, err := GormToEntity(nil)
+			entityPostOne, err := GormToEntityPost(nil)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entityPostOne).To(BeNil())
 
-			entityPostTwo, err := ArrayGormToArrayEntity(nil)
+			entityPostTwo, err := ArrayGormToArrayEntityPost(nil)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entityPostTwo).To(BeNil())
@@ -53,12 +53,12 @@ var _ = Describe("Post", func() {
 
 			Expect(err).NotTo(HaveOccurred())
 
-			gormPost, err := EntityToGorm(entityOne)
+			gormPost, err := EntityToGormPost(entityOne)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(gormPost).NotTo(BeNil())
 
-			_, err = EntityToGorm(entityTwo)
+			_, err = EntityToGormPost(entityTwo)
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -72,7 +72,7 @@ var _ = Describe("Post", func() {
 
 		It("can transform an entity array into a model array", func() {
 			arrayEntityPost := []Post{}
-			arrayGormPost, err := ArrayEntityToArrayGorm(&arrayEntityPost)
+			arrayGormPost, err := ArrayEntityToArrayGormPost(&arrayEntityPost)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(arrayGormPost).NotTo(BeNil())
@@ -90,13 +90,13 @@ var _ = Describe("Post", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			arrayEntityPost = []Post{*entityOne, *entityTwo}
-			arrayGormPost, err = ArrayEntityToArrayGorm(&arrayEntityPost)
+			arrayGormPost, err = ArrayEntityToArrayGormPost(&arrayEntityPost)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(arrayGormPost).NotTo(BeNil())
 
 			arrayEntityPost = []Post{}
-			_, err = ArrayEntityToArrayGorm(&arrayEntityPost)
+			_, err = ArrayEntityToArrayGormPost(&arrayEntityPost)
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -142,12 +142,12 @@ var _ = Describe("Post", func() {
 				},
 			}
 
-			entityPostOne, err := GormToEntity(&gormOne)
+			entityPostOne, err := GormToEntityPost(&gormOne)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(entityPostOne).NotTo(BeNil())
 
-			_, err = GormToEntity(&gormTwo)
+			_, err = GormToEntityPost(&gormTwo)
 
 			Expect(err).NotTo(HaveOccurred())
 
@@ -160,7 +160,7 @@ var _ = Describe("Post", func() {
 
 		It("can transform a model array into an entity array", func() {
 			arrayGormPost := []GormPostModel{}
-			arrayEntityPost, err := ArrayGormToArrayEntity(&arrayGormPost)
+			arrayEntityPost, err := ArrayGormToArrayEntityPost(&arrayGormPost)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(arrayEntityPost).NotTo(BeNil())
@@ -190,13 +190,13 @@ var _ = Describe("Post", func() {
 			}
 
 			arrayGormPost = []GormPostModel{gormOne, gormTwo}
-			arrayEntityPost, err = ArrayGormToArrayEntity(&arrayGormPost)
+			arrayEntityPost, err = ArrayGormToArrayEntityPost(&arrayGormPost)
 
 			Expect(err).NotTo(HaveOccurred())
 			Expect(arrayEntityPost).NotTo(BeNil())
 
 			arrayGormPost = []GormPostModel{}
-			_, err = ArrayGormToArrayEntity(&arrayGormPost)
+			_, err = ArrayGormToArrayEntityPost(&arrayGormPost)
 
 			Expect(err).NotTo(HaveOccurred())
 

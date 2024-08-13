@@ -17,4 +17,14 @@ var _ = Describe("Auth", func() {
 
 		Expect(response.Mnemonic).To(Equal(addressBTC.GetMnemonic()))
 	})
+
+	It("can transform an entity into ToGetAddressFromMnemonicAuthQueryResponse", func() {
+		addressBTC := tools.NewAddressBTC()
+
+		response, err := ToGetAddressFromMnemonicAuthQueryResponse(addressBTC.GetAddress())
+
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(response.Address).To(Equal(addressBTC.GetAddress()))
+	})
 })

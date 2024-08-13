@@ -65,6 +65,8 @@ func (application Application) Run() error {
 		QueryCQRS:   &application.QueryCQRS,
 	}
 
+	route.POST("/auth/login", authController.Login)
+
 	route.GET("/auth/login", authController.ShowLogin)
 
 	postController := controllers.GinPostController{

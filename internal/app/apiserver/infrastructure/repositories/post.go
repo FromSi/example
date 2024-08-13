@@ -22,7 +22,7 @@ func NewGormPostRepository(database *gorm.DB) *GormPostRepository {
 }
 
 func (repository *GormPostRepository) Create(post *entities.Post) error {
-	model, err := mappers.EntityToGorm(post)
+	model, err := mappers.EntityToGormPost(post)
 
 	if err != nil {
 		return err
@@ -32,7 +32,7 @@ func (repository *GormPostRepository) Create(post *entities.Post) error {
 }
 
 func (repository *GormPostRepository) UpdateById(id string, post *entities.Post) error {
-	model, err := mappers.EntityToGorm(post)
+	model, err := mappers.EntityToGormPost(post)
 
 	if err != nil {
 		return err
@@ -52,7 +52,7 @@ func (repository *GormPostRepository) FindByFilterWithTrashed(filter filters.Fin
 		return nil, err
 	}
 
-	postEntity, err = mappers.GormToEntity(&postModel)
+	postEntity, err = mappers.GormToEntityPost(&postModel)
 
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (repository *GormPostRepository) GetAll(pageable entities.Pageable, sortabl
 		return nil, err
 	}
 
-	postEntities, err = mappers.ArrayGormToArrayEntity(&postModels)
+	postEntities, err = mappers.ArrayGormToArrayEntityPost(&postModels)
 
 	if err != nil {
 		return nil, err
