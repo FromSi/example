@@ -93,6 +93,8 @@ paths:
                     required:
                       - access_token
                       - refresh_token
+                      - token_type
+                      - expires_in
                     properties:
                       token_type:
                         type: string
