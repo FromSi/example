@@ -1,6 +1,11 @@
 app:
+  name: example
   host: localhost
   port: 8080
+  secret_key: secret
+auth:
+  expiration_refresh_token_in_days: 30
+  expiration_access_token_in_minutes: 30
 relation_database:
   connection:
     master: sqlite

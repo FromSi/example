@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const ExpirationInMinutes = 30
+
 var _ = Describe("JWT", func() {
 	secretKey := "test"
 
@@ -18,7 +20,7 @@ var _ = Describe("JWT", func() {
 			subject := faker.Word()
 			timeNow := time.Now()
 
-			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow)
+			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow, ExpirationInMinutes)
 
 			jwtToken, err := sessionJWT.GetJWT(secretKey)
 
@@ -39,7 +41,7 @@ var _ = Describe("JWT", func() {
 			subject := faker.Word()
 			timeNow := time.Now().AddDate(0, 0, 1)
 
-			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow)
+			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow, ExpirationInMinutes)
 
 			tokenJWT, err := sessionJWT.GetJWT(secretKey)
 
@@ -54,9 +56,9 @@ var _ = Describe("JWT", func() {
 			issuer := faker.Word()
 			audience := faker.Word()
 			subject := faker.Word()
-			timeNow := time.Now().AddDate(0, 0, -ExpirationInDays)
+			timeNow := time.Now().Add(-time.Minute * ExpirationInMinutes)
 
-			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow)
+			sessionJWT := NewSessionJWT(issuer, audience, subject, timeNow, ExpirationInMinutes)
 
 			tokenJWT, err := sessionJWT.GetJWT(secretKey)
 

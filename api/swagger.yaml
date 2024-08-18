@@ -91,10 +91,11 @@ paths:
                   data:
                     type: object
                     required:
+                      - token_type
                       - access_token
                       - refresh_token
-                      - token_type
-                      - expires_in
+                      - access_token_expires_in
+                      - refresh_token_expires_in
                     properties:
                       token_type:
                         type: string
@@ -110,7 +111,11 @@ paths:
                         type: string
                         format: uuid
                         example: '09d0ce56-33ab-4fce-90bb-d2b4d6d844ba'
-                      expires_in:
+                      access_token_expires_in:
+                        type: integer
+                        format: unix
+                        example: 1516300000
+                      refresh_token_expires_in:
                         type: integer
                         format: unix
                         example: 1516300000

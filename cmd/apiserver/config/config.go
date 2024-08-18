@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	App              ConfigApp
+	Auth             ConfigAuth
 	RelationDatabase ConfigRelationDatabase
 }
 
@@ -15,6 +16,7 @@ func (config *Config) Init() *Config {
 	currentKey := getAbsoluteKey("", "")
 
 	config.App.Init(currentKey)
+	config.Auth.Init(currentKey)
 	config.RelationDatabase.Init(currentKey)
 
 	return config
@@ -42,15 +44,33 @@ func NewConfig() (*Config, error) {
 }
 
 type ConfigApp struct {
-	Host string
-	Port int
+	Name      string
+	SecretKey string
+	Host      string
+	Port      int
 }
 
 func (config *ConfigApp) Init(parentKey string) *ConfigApp {
 	currentKey := getAbsoluteKey(parentKey, "app")
 
+	config.Name = viper.GetString(getAbsoluteKey(currentKey, "name"))
+	config.SecretKey = viper.GetString(getAbsoluteKey(currentKey, "secret_key"))
 	config.Host = viper.GetString(getAbsoluteKey(currentKey, "host"))
 	config.Port = viper.GetInt(getAbsoluteKey(currentKey, "port"))
+
+	return config
+}
+
+type ConfigAuth struct {
+	ExpirationRefreshTokenInDays   int
+	ExpirationAccessTokenInMinutes int
+}
+
+func (config *ConfigAuth) Init(parentKey string) *ConfigAuth {
+	currentKey := getAbsoluteKey(parentKey, "auth")
+
+	config.ExpirationRefreshTokenInDays = viper.GetInt(getAbsoluteKey(currentKey, "expiration_refresh_token_in_days"))
+	config.ExpirationAccessTokenInMinutes = viper.GetInt(getAbsoluteKey(currentKey, "expiration_access_token_in_minutes"))
 
 	return config
 }

@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	ExpirationInDays             = 30
 	CommonJWTClaimIssuer         = "iss"
 	CommonJWTClaimAudience       = "aud"
 	CommonJWTClaimSubject        = "sub"
 	CommonJWTClaimIssuedAt       = "iat"
 	CommonJWTClaimExpirationTime = "exp"
+	UserJWTClaimAudienceType     = "user"
 )
 
 type SessionJWT struct {
@@ -24,13 +24,13 @@ type SessionJWT struct {
 	ExpirationTime time.Time
 }
 
-func NewSessionJWT(issuer string, audience string, subject string, timeNow time.Time) *SessionJWT {
+func NewSessionJWT(issuer string, audience string, subject string, timeNow time.Time, expirationInMinutes int) *SessionJWT {
 	return &SessionJWT{
 		Issuer:         issuer,
 		Audience:       audience,
 		Subject:        subject,
 		IssuedAt:       timeNow,
-		ExpirationTime: timeNow.AddDate(0, 0, ExpirationInDays),
+		ExpirationTime: timeNow.Add(time.Minute * time.Duration(expirationInMinutes)),
 	}
 }
 
